@@ -13,12 +13,13 @@ Required inputs:
 1. Clone repo git clone
 
 2. To create a docker: 
-'cd docker'
-'docker build -t itmt -f Dockerfile . --no-cache'
+`docker build -t itmt -f Dockerfile .`
 
-3. To run docker on example MRI: 'docker run -it itmt'
+3. To run docker on example MRI: `docker run -it itmt`
 
-4. To run docker on your own MRI: 'docker run -it -v local_folder_with_nii_path:/out itmt python3.9 ./main.py --age X --gender X --img_path out/file.nii --path_to out'
+4. To run docker on your own MRI: `docker run -it -v local_folder_with_nii_path:/out itmt python3.9 ./main.py --age X --gender X --img_path out/file.nii --path_to out`
+
+where:
 
 - local_folder_with_nii_path is the path to the folder with your MRI and file.nii is the name of the MRI file; it is also the path to the output folder where the results will be saved.
 - in --age X, X should be replaced with the age of the subject in years
