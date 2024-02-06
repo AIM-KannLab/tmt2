@@ -176,6 +176,8 @@ def predict_itmt(age = 9, gender="M",
     # path to store registered image in
     patient_id = img_path.split("/")[-1].split(".")[0]
     new_path_to = path_to+patient_id
+    if not os.path.exists(path_to):
+        os.mkdir(path_to)
     if not os.path.exists(new_path_to):
         os.mkdir(new_path_to)
 
