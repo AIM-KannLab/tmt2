@@ -1,0 +1,29 @@
+# Python stuff
+*.egg-info
+.coverage
+__pycache__
+coverage.xml
+cov.xml
+dist
+junit.xml
+.python-version
+
+# Mac stuff
+.DS_Store
+
+# Editor specific stuff
+.vscode
+.idea/
+
+# Gear stuff
+config.json
+config.json.back
+.input_map.json
+
+# Docker
+.dockerignore
+
+# Misc
+*.svs
+*.nii.gz
+data/
