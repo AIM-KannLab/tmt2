@@ -26,4 +26,3 @@ config.json.back
 # Misc
 *.svs
 *.nii.gz
-data/
