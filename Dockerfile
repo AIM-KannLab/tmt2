@@ -31,19 +31,13 @@ RUN python3.9 -c "import tensorflow"
 
 #############################################
 # Setup default ENV_FOLDER/v0 directory
-ENV ENV_FOLDER="/ENV_FOLDER/v0"
-RUN mkdir -p ${ENV_FOLDER}
-WORKDIR ${ENV_FOLDER}
-COPY *.py ${ENV_FOLDER}/
-COPY *.csv ${ENV_FOLDER}/
-COPY scripts ${ENV_FOLDER}/scripts
-COPY golden_image ${ENV_FOLDER}/golden_image
-COPY model_weights ${ENV_FOLDER}/model_weights
-COPY preprocessing ${ENV_FOLDER}/preprocessing
-# reload bashrc
-RUN ["/bin/bash", "-c", "source /root/.bashrc"]
-
-#############################################
-# Configure entrypoint
-RUN chmod a+x /ENV_FOLDER/v0/run
+COPY scripts /scripts
+COPY golden_image /golden_image
+COPY model_weights /model_weights
+COPY preprocessing /preprocessing
+COPY percentiles_chart_boys.csv /
+COPY percentiles_chart_girls.csv /
+COPY data data/
+COPY *.py /
+COPY *.csv /
 CMD [ "python3.9", "./main.py" ]

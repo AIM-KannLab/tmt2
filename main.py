@@ -14,9 +14,9 @@ if __name__ == '__main__':
                         help = 'Age of MRI subject in YEARS')
     parser.add_argument('--gender', '-g',type = str, default = 'F',
                         help = 'Gender MRI subject (M/F)')
-    parser.add_argument('--img_path', '-pf',type = str, default = 'data/sub-pixar066_anat_sub-pixar066_T1w.nii.gz',
-                        help = 'Path to input MRI subject')
-    parser.add_argument('--path_to', '-pt',type = str, default = 'output/',
+    parser.add_argument('--input_path', '-pf', type = str, default = 'data/sub-pixar066_anat_sub-pixar066_T1w.nii.gz',
+                        help = 'Path to input MRI subject/subjects')
+    parser.add_argument('--path_to', '-pt',type = str, default = 'out/results/',
                         help = 'Path to save results')
     parser.add_argument('--cuda_visible_devices', '-c',type = str, default = '',
                         help = 'Specify cuda visible devices, default:None')
@@ -28,6 +28,8 @@ if __name__ == '__main__':
                         help = 'CSV centiles path, boys model')
     parser.add_argument('--df_centile_girls_csv', '-w',type = str, default = 'percentiles_chart_girls.csv',
                         help = 'CSV centiles path, girls model') 
+    parser.add_argument('--meta_path', '-pm',type = str, default = 'data/meta.csv',
+                        help = 'Path to metafile - only for multiple subjects')
     
     args = parser.parse_args()
     itmt = predict_itmt(**vars(args))
