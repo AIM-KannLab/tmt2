@@ -1,3 +1,2 @@
 filename,age,sex
-input/sub-pixar066_anat_sub-pixar066_T1w.nii.gz,6,F
-input/sub-pixar067_anat_sub-pixar067_T1w.nii.gz,7,M
+data/input/sub-pixar066_anat_sub-pixar066_T1w.nii.gz,6,F

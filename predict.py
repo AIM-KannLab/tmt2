@@ -186,30 +186,48 @@ def predict_itmt(age = 9, gender="M",
             decompression_channels=[256, 128, 64, 32, 16])
     model_unet.load_weights(model_weight_path_segmentation)
     print('\n','\n','\n','loaded:' ,model_weight_path_segmentation)  
-           
+    
     list_of_nii_images,list_of_ages,list_of_sexes = [],[],[]
     # check if img_path is a path to a folder or a file
     if os.path.isdir(input_path):
         # make list of all nii files in the folder
-        print("its a path")
         list_of_nii_images = glob.glob(input_path+"/*.nii*")
-        meta_df = pd.read_csv(meta_path, header=0)
-        list_of_ages = meta_df['age'].tolist()
-        list_of_sexes = meta_df['sex'].tolist()
+        meta_df = pd.read_csv(meta_path, header=0) 
+        ommited_files = []
+        # Pull age and gender by img_path from meta_df
+        temp_list = list_of_nii_images.copy()
+        for img_path in list_of_nii_images:
+            # find if img_path in meta_df['filename']
+            age, gender = 0, 0
+            for idx, row in meta_df.iterrows():
+                if str(img_path) in row['filename']:
+                    age = row['age']
+                    gender = row['sex']
+                    list_of_ages.append(age)
+                    list_of_sexes.append(gender)
+                    
+            if age == 0:
+                print("No metadata found for", img_path)
+                temp_list.remove(img_path)
+                ommited_files.append(img_path)
+                
+        list_of_nii_images = temp_list.copy()
     else:
         print("its a file")
         list_of_nii_images.append(input_path)
         list_of_sexes.append(gender)
         list_of_ages.append(age)
      
+    print(list_of_nii_images,list_of_ages)
        
     for idx in range(len(list_of_nii_images)):
+        #retrieve by name
         img_path = list_of_nii_images[idx]
         age = list_of_ages[idx]
         gender = list_of_sexes[idx]
         
         image, affine = load_nii(img_path)
-
+    
         # path to store registered image in
         patient_id = img_path.split("/")[-1].split(".")[0]
         new_path_to = path_to+patient_id
@@ -238,7 +256,6 @@ def predict_itmt(age = 9, gender="M",
         cmd_line = "zscore-normalize "+new_path_to+"/no_z/registered_no_z.nii -o "+new_path_to+'/registered_z.nii'
         subprocess.getoutput(cmd_line)    
 
-        
 
         image_sitk = sitk.ReadImage(new_path_to+'/registered_z.nii')    
         windowed_images  = sitk.GetArrayFromImage(image_sitk)           
@@ -365,7 +382,9 @@ def predict_itmt(age = 9, gender="M",
         concated = np.concatenate((infer_seg_array_2d_1_filtered[:100,:,0],infer_seg_array_2d_2_filtered[100:,:,0]),axis=0)    
         infer_seg_array_3d_merged_filtered[:,:,slice_label] = np.pad(concated,[[0,0],[15,21]],'constant',constant_values=0)
         
-
+        infer_3d_path = new_path_to+"/"+patient_id+'mask.nii.gz'
+        save_nii(infer_seg_array_3d_merged_filtered, infer_3d_path, affine)
+            
         objL_pred_minf_line, objR_pred_minf_line, objL_pred_minf, objR_pred_minf = 0,0,0,0
                         
         crop_line = compute_crop_line(image_array[:,15:-21,slice_label],infer_seg_array_2d_1_filtered,infer_seg_array_2d_2_filtered)
@@ -424,5 +443,9 @@ def predict_itmt(age = 9, gender="M",
         li.append(df)
     frame = pd.concat(li, axis=0, ignore_index=True)
     frame.to_csv(path_to+"/results.csv",index=False)
+    
+    print("All results saved to:",path_to+"/results.csv")
+    print("Files not processed due to metadata not found error:", ommited_files)
+    
                     
                     
