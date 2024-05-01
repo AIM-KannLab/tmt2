@@ -429,9 +429,9 @@ def predict_itmt(age = 9, gender="M",
         # save results
         result = np.array([patient_id,float(age),gender,
                         input_tmt, centile,
-                        CSA_PRED_TM1,CSA_PRED_TM2])
+                        CSA_PRED_TM1,CSA_PRED_TM2, objL_pred_minf, objR_pred_minf])
         
-        df_results = pd.DataFrame([result], columns=['PatientID','Age','Gender','iTMT','Centile','CSA_TM1','CSA_TM2'])
+        df_results = pd.DataFrame([result], columns=['PatientID','Age','Gender','iTMT','Centile','CSA_TM1','CSA_TM2','TMT1','TMT2'])
         df_results.to_csv(path_to+"/"+patient_id+"_results.csv",index=False)
         print("Results saved to:",path_to+"/"+patient_id+"_results.csv")
         
