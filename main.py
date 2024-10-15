@@ -14,7 +14,7 @@ if __name__ == '__main__':
                         help = 'Age of MRI subject in YEARS')
     parser.add_argument('--gender', '-g',type = str, default = 'F',
                         help = 'Gender MRI subject (M/F)')
-    parser.add_argument('--input_path', '-pf', type = str, default = 'data/sub-pixar066_anat_sub-pixar066_T1w.nii.gz',
+    parser.add_argument('--input_path', '-pf', type = str, default = 'data/input/sub-pixar066_anat_sub-pixar066_T1w.nii.gz',
                         help = 'Path to input MRI subject/subjects')
     parser.add_argument('--path_to', '-pt',type = str, default = 'out/results/',
                         help = 'Path to save results')
