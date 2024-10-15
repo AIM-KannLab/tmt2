@@ -16,7 +16,7 @@ The docker will run inference with the pre-trained deep learning model to genera
 - Sex (string, M/F)
 
 ## Usage
-1. Clone the repo: `git clone <repository_url>`
+1. Clone the repo: `git clone <repository_url>` & `cd tmt2`
 
 2. To create a docker:
 `docker build -t itmt -f Dockerfile .`
