@@ -416,6 +416,7 @@ def predict_itmt(age = 9, gender="M",
             
         print("Age:",str(age)," Gender:",gender)
         print("iTMT[mm]:", input_tmt)
+        print("Slice label:",slice_label)
         
         # centiles estimation
         df_centile_boys = pd.read_csv(df_centile_boys_csv,header=0)
@@ -429,9 +430,9 @@ def predict_itmt(age = 9, gender="M",
         # save results
         result = np.array([patient_id,float(age),gender,
                         input_tmt, centile,
-                        CSA_PRED_TM1,CSA_PRED_TM2, objL_pred_minf, objR_pred_minf])
+                        CSA_PRED_TM1,CSA_PRED_TM2, objL_pred_minf, objR_pred_minf,slice_label])
         
-        df_results = pd.DataFrame([result], columns=['PatientID','Age','Gender','iTMT','Centile','CSA_TM1','CSA_TM2','TMT1','TMT2'])
+        df_results = pd.DataFrame([result], columns=['PatientID','Age','Gender','iTMT','Centile','CSA_TM1','CSA_TM2','TMT1','TMT2',"Slice_label"])
         df_results.to_csv(path_to+"/"+patient_id+"_results.csv",index=False)
         print("Results saved to:",path_to+"/"+patient_id+"_results.csv")
         
