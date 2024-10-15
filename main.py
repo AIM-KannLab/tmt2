@@ -16,7 +16,7 @@ if __name__ == '__main__':
                         help = 'Gender MRI subject (M/F)')
     parser.add_argument('--input_path', '-pf', type = str, default = 'data/input/sub-pixar066_anat_sub-pixar066_T1w.nii.gz',
                         help = 'Path to input MRI subject/subjects')
-    parser.add_argument('--path_to', '-pt',type = str, default = 'out/results/',
+    parser.add_argument('--path_to', '-pt',type = str, default = 'out/',
                         help = 'Path to save results')
     parser.add_argument('--cuda_visible_devices', '-c',type = str, default = '',
                         help = 'Specify cuda visible devices, default:None')
