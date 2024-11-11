@@ -1,34 +1,35 @@
 # Predict Temporalis Muscle Thickness Score
+Upd. 11.11.24: added pseudo-3d segmentation (segmentation is still 2d, it just goes +-n_slices up and down to create a "belt" and 3d metrics will be calculated)
 
 ## Prerequisites
 - Docker OR Singularity (use tmt.def file)
 
 ## Note
-- This is a CPU-only release. The docker will run on CPU, and the inference time will depend on the number of subjects and the size of the MRI files.
-- This won't work on MAC OS. It is recommended to use Linux or Windows.
+- This is a CPU-only release. The docker will run on the CPU, and the inference time will depend on the number of subjects and the size of the MRI files.
+- This won't work on MAC OS. Linux or Windows is recommended.
 
 ## Description
-The docker will run inference with the pre-trained deep learning model to generate a temporalis muscle (TM) segmentation and output a predicted sarcopenia score based on a subject's TMT, age, and sex.
+The docker will run an inference with the pre-trained deep learning model to generate a temporalis muscle (TM) segmentation and output a predicted sarcopenia score based on a subject's TMT, age, and sex.
 
 ## Required Inputs
-- T1 image (nifti)
+- T1 image (nifty)
 - Age (float)
 - Sex (string, M/F)
 
-## Usage
+## Usage (Docker)
 1. Clone the repo: `git clone <repository_url>` & `cd tmt2`
 
 2. To create a docker:
 `docker build -t itmt -f Dockerfile .`
 
-3. To run docker on example MRI:
+3. To run docker on an example MRI:
 `docker run -it itmt`
 
 4. To run docker on your own *SINGLE MRI*:
 
+`docker run -it -v <local_folder_with_nii_path>:/out itmt python3.9 ./main.py --age 9 --gender F --input_path data/input/sub-pixar066_anat_sub-pixar066_T1w.nii.gz`
+OR with 3d option:
 `docker run -it -v <local_folder_with_nii_path>:/out itmt python3.9 ./main.py --age 9 --gender F  --enable_3d True --input_path data/input/sub-pixar066_anat_sub-pixar066_T1w.nii.gz`
-
-docker run -it -v /media/sda/Anna/tmt2/data/input/:/out itmt python3.9 ./main.py --age 9 --gender F  --enable_3d True --input_path data/input/sub-pixar066_anat_sub-pixar066_T1w.nii.gz
 
 - `local_folder_with_nii_path`: The folder mounted to the docker container. It should contain the MRI file or files to process. Results will be saved in the same folder in the 'results' subfolder.
 - `input_path`: Path to the MRI file or folder with MRI files.
