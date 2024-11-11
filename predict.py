@@ -42,8 +42,8 @@ warnings.filterwarnings('ignore')
 #os.environ["TF_CPP_MIN_LOG_LEVEL"] = '3'
 
 # MNI templates 
-age_ranges = {"golden_image/mni_templates/nihpd_asym_04.5-08.5_t1w.nii" : {"min_age":3, "max_age":7},
-                "golden_image/mni_templates/nihpd_asym_07.5-13.5_t1w.nii": {"min_age":8, "max_age":13},
+age_ranges = {"golden_image/mni_templates/nihpd_asym_04.5-08.5_t1w.nii" : {"min_age":3, "max_age":7.999},
+                "golden_image/mni_templates/nihpd_asym_07.5-13.5_t1w.nii": {"min_age":8, "max_age":13.99999},
                 "golden_image/mni_templates/nihpd_asym_13.0-18.5_t1w.nii": {"min_age":14, "max_age":35}}
 
 # function to compute the crop line (max and min y coordinates of the contour)
