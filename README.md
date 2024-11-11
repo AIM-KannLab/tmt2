@@ -1,7 +1,7 @@
 # Predict Temporalis Muscle Thickness Score
 
 ## Prerequisites
-- Docker
+- Docker OR Singularity (use tmt.def file)
 
 ## Note
 - This is a CPU-only release. The docker will run on CPU, and the inference time will depend on the number of subjects and the size of the MRI files.
@@ -26,10 +26,9 @@ The docker will run inference with the pre-trained deep learning model to genera
 
 4. To run docker on your own *SINGLE MRI*:
 
-`docker run -it -v <local_folder_with_nii_path>:/out itmt python3.9 ./main.py --age 9 --gender F --input_path data/input/sub-pixar066_anat_sub-pixar066_T1w.nii.gz`
-OR
-if you need a Pseudo-3d, enable using the following:
 `docker run -it -v <local_folder_with_nii_path>:/out itmt python3.9 ./main.py --age 9 --gender F  --enable_3d True --input_path data/input/sub-pixar066_anat_sub-pixar066_T1w.nii.gz`
+
+docker run -it -v /media/sda/Anna/tmt2/data/input/:/out itmt python3.9 ./main.py --age 9 --gender F  --enable_3d True --input_path data/input/sub-pixar066_anat_sub-pixar066_T1w.nii.gz
 
 - `local_folder_with_nii_path`: The folder mounted to the docker container. It should contain the MRI file or files to process. Results will be saved in the same folder in the 'results' subfolder.
 - `input_path`: Path to the MRI file or folder with MRI files.
