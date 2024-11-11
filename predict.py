@@ -1,4 +1,3 @@
-from __future__ import generators
 import logging
 import glob, os, functools
 import sys
