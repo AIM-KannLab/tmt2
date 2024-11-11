@@ -27,11 +27,15 @@ The docker will run inference with the pre-trained deep learning model to genera
 4. To run docker on your own *SINGLE MRI*:
 
 `docker run -it -v <local_folder_with_nii_path>:/out itmt python3.9 ./main.py --age 9 --gender F --input_path data/input/sub-pixar066_anat_sub-pixar066_T1w.nii.gz`
+OR
+if you need a Pseudo-3d, enable using the following:
+`docker run -it -v <local_folder_with_nii_path>:/out itmt python3.9 ./main.py --age 9 --gender F  --enable_3d True --input_path data/input/sub-pixar066_anat_sub-pixar066_T1w.nii.gz`
 
 - `local_folder_with_nii_path`: The folder mounted to the docker container. It should contain the MRI file or files to process. Results will be saved in the same folder in the 'results' subfolder.
 - `input_path`: Path to the MRI file or folder with MRI files.
 - `age`: Age of the subject in years.
 - `gender`: Gender of the subject (M/F).
+- `enable_3d`: If True, the model will run in 3D mode. If False, the model will run in 2D mode.
 
 Example of running docker on *MULTIPLE MRI* files:
 `docker run -it -v <local_folder_with_nii_path>:/out itmt python3.9 ./main.py --input_path data/input/ --meta_path data/meta.csv`
