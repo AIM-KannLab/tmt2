@@ -30,6 +30,8 @@ if __name__ == '__main__':
                         help = 'CSV centiles path, girls model') 
     parser.add_argument('--meta_path', '-pm',type = str, default = 'data/meta.csv',
                         help = 'Path to metafile - only for multiple subjects')
+    parser.add_argument('--enable_3d', '-3d',type = bool, default = False,
+                        help = 'Enable 3d calculation')
     
     args = parser.parse_args()
     itmt = predict_itmt(**vars(args))
