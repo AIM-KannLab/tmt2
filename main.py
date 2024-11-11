@@ -28,6 +28,10 @@ if __name__ == '__main__':
                         help = 'CSV centiles path, boys model')
     parser.add_argument('--df_centile_girls_csv', '-w',type = str, default = 'percentiles_chart_girls.csv',
                         help = 'CSV centiles path, girls model') 
+    parser.add_argument('--df_centile_boys_csv_csa', '-m',type = str, default = 'percentiles_chart_boys_csa.csv',
+                        help = 'CSV centiles path, boys model csa')
+    parser.add_argument('--df_centile_girls_csv_csa', '-w',type = str, default = 'percentiles_chart_girls_csa.csv',
+                        help = 'CSV centiles path, girls model csa') 
     parser.add_argument('--meta_path', '-pm',type = str, default = 'data/meta.csv',
                         help = 'Path to metafile - only for multiple subjects')
     parser.add_argument('--enable_3d', '-3d',type = bool, default = False,
