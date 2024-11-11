@@ -623,37 +623,38 @@ def predict_itmt(age = 9, gender="M",
                 print("Results saved to:",new_path_to+"/"+patient_id+"_results.csv")
             
     # concatenate all results .csv files into one
-    all_files = glob.glob(new_path_to+"/*_results.csv")
-    li = []
-    for filename in all_files:
-        df = pd.read_csv(filename, index_col=None, header=0)
-        li.append(df)
-    frame = pd.concat(li, axis=0, ignore_index=True)
-    frame.to_csv(path_to+"/_results2d.csv",index=False)
-    
-    print("All 2D results saved to:",path_to+"/_results2d.csv")
-    
-    # concatenate all results .csv files into one
-    all_files = glob.glob(new_path_to+"/*_results_3d_temp.csv")
-    li = []
-    for filename in all_files:
-        df = pd.read_csv(filename, index_col=None, header=0)
-        li.append(df)
-    frame = pd.concat(li, axis=0, ignore_index=True)
-    frame.to_csv(path_to+"/_results_all_3d.csv",index=False)
-    
-    print("All 3d results saved to:",path_to+"/_results_all_3d.csv")
-    
-    # concatenate all results .csv files into one
-    all_files = glob.glob(new_path_to+"/*_3d.csv")
-    li = []
-    for filename in all_files:
-        df = pd.read_csv(filename, index_col=None, header=0)
-        li.append(df)
-    frame = pd.concat(li, axis=0, ignore_index=True)
-    frame.to_csv(path_to+"/_middle_only_3d.csv",index=False)
-    
-    print("only middle slice + 3d results saved to:",path_to+"/_middle_only_3d.csv")
-    
+    if enable_3d==False:
+        all_files = glob.glob(new_path_to+"/*_results.csv")
+        li = []
+        for filename in all_files:
+            df = pd.read_csv(filename, index_col=None, header=0)
+            li.append(df)
+        frame = pd.concat(li, axis=0, ignore_index=True)
+        frame.to_csv(path_to+"/_results2d.csv",index=False)
+        
+        print("All results saved to:",path_to+"/_results2d.csv")
+    else:
+        # concatenate all results .csv files into one
+        all_files = glob.glob(new_path_to+"/*_results_3d_temp.csv")
+        li = []
+        for filename in all_files:
+            df = pd.read_csv(filename, index_col=None, header=0)
+            li.append(df)
+        frame = pd.concat(li, axis=0, ignore_index=True)
+        frame.to_csv(path_to+"/_results_all_3d.csv",index=False)
+        
+        print("All results saved to:",path_to+"/_results_all_3d.csv")
+        
+        # concatenate all results .csv files into one
+        all_files = glob.glob(new_path_to+"/*_3d.csv")
+        li = []
+        for filename in all_files:
+            df = pd.read_csv(filename, index_col=None, header=0)
+            li.append(df)
+        frame = pd.concat(li, axis=0, ignore_index=True)
+        frame.to_csv(path_to+"/_middle_only_3d.csv",index=False)
+        
+        print("All results saved to:",path_to+"/_middle_only_3d.csv")
+        
+                        
                     
-                  
