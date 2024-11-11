@@ -381,7 +381,7 @@ def predict_itmt(age = 9, gender="M",
                 result = np.array([patient_id,float(age),gender,
                             0, 0, 0,
                             0, 0, 0,
-                            slice_label, 0,
+                            slice_label, 0,n_slices,
                             0,0,0,0,0,0,0,0,0,0,0,0,0,
                             0,0,0,0,0,0,0,0,0,0,0,0,0,
                             0,0,0,0,0,0,0,0,0,0,0,0,0])
@@ -389,7 +389,7 @@ def predict_itmt(age = 9, gender="M",
                 df_results = pd.DataFrame([result], columns=['PatientID','Age','Gender',
                                                                 'TMT1','TMT2','Centile_iTMT',
                                                                 'CSA_TM1','CSA_TM2','Centile_iCSA',
-                                                                "Slice_label","Hausdorff_distance_btw_TMs",
+                                                                "Slice_label","min_distance_btw_TMs","n_slices"
                                                                 "volume1","volume_convexhull1","surface_area1","diameter_volume_equivalent1","diameter_surfacearea_equivalent1","width_3d_bb1","length_3d_bb1","height_3d_bb1","feret_3d_max1","feret_3d_min1","x_max_3d1","y_max_3d1","z_max_3d1",
                                                                 "volume2","volume_convexhull2","surface_area2","diameter_volume_equivalent2","diameter_surfacearea_equivalent2","width_3d_bb2","length_3d_bb2","height_3d_bb2","feret_3d_max2","feret_3d_min2","x_max_3d2","y_max_3d2","z_max_3d2",
                                                                 'volume","volume_convexhull","surface_area","diameter_volume_equivalent","diameter_surfacearea_equivalent","width_3d_bb","length_3d_bb","height_3d_bb","feret_3d_max","feret_3d_min","x_max_3d","y_max_3d","z_max_3d'])
@@ -581,14 +581,14 @@ def predict_itmt(age = 9, gender="M",
                             objL_pred_minf, objR_pred_minf, centile_tmt,
                             CSA_PRED_TM1_line, CSA_PRED_TM2_line, centile_csa,
                             slice_label, 
-                            hd,
+                            hd,n_slices,
                             m1['volume'],m1['volume_convexhull'],m1['surface_area'],m1['diameter_volume_equivalent'],m1['diameter_surfacearea_equivalent'],m1['width_3d_bb'],m1['length_3d_bb'],m1['height_3d_bb'],m1['feret_3d_max'],m1['feret_3d_min'],m1['x_max_3d'],m1['y_max_3d'],m1['z_max_3d'],
                             m2['volume'],m2['volume_convexhull'],m2['surface_area'],m2['diameter_volume_equivalent'],m2['diameter_surfacearea_equivalent'],m2['width_3d_bb'],m2['length_3d_bb'],m2['height_3d_bb'],m2['feret_3d_max'],m2['feret_3d_min'],m2['x_max_3d'],m2['y_max_3d'],m2['z_max_3d'],
                             (m1['volume']+m2['volume'])/2, (m1['volume_convexhull']+m2['volume_convexhull'])/2, (m1['surface_area']+m2['surface_area'])/2, (m1['diameter_volume_equivalent']+m2['diameter_volume_equivalent'])/2, (m1['diameter_surfacearea_equivalent']+m2['diameter_surfacearea_equivalent'])/2, (m1['width_3d_bb']+m2['width_3d_bb'])/2, (m1['length_3d_bb']+m2['length_3d_bb'])/2, (m1['height_3d_bb']+m2['height_3d_bb'])/2, (m1['feret_3d_max']+m2['feret_3d_max'])/2, (m1['feret_3d_min']+m2['feret_3d_min'])/2, (m1['x_max_3d']+m2['x_max_3d'])/2, (m1['y_max_3d']+m2['y_max_3d'])/2, (m1['z_max_3d']+m2['z_max_3d'])/2])  
                 df_results = pd.DataFrame([result], columns=['PatientID','Age','Gender',
                                                             'TMT1','TMT2','Centile_iTMT',
                                                             'CSA_TM1','CSA_TM2','Centile_iCSA',
-                                                            "Slice_label","Hausdorff_distance_btw_TMs",
+                                                            "Slice_label","min_distance_btw_TMs","n_slices",
                                                             'volume1','volume_convexhull1','surface_area1','diameter_volume_equivalent1','diameter_surfacearea_equivalent1','width_3d_bb1','length_3d_bb1','height_3d_bb1','feret_3d_max1','feret_3d_min1','x_max_3d1','y_max_3d1','z_max_3d1',
                                                             'volume2','volume_convexhull2','surface_area2','diameter_volume_equivalent2','diameter_surfacearea_equivalent2','width_3d_bb2','length_3d_bb2','height_3d_bb2','feret_3d_max2','feret_3d_min2','x_max_3d2','y_max_3d2','z_max_3d2',
                                                             'volume','volume_convexhull','surface_area','diameter_volume_equivalent','diameter_surfacearea_equivalent','width_3d_bb','length_3d_bb','height_3d_bb','feret_3d_max','feret_3d_min','x_max_3d','y_max_3d','z_max_3d'])
@@ -597,14 +597,14 @@ def predict_itmt(age = 9, gender="M",
                             objL_pred_minf, objR_pred_minf, centile_tmt,
                             CSA_PRED_TM1_line, CSA_PRED_TM2_line, centile_csa,
                             slice_label, 
-                            hd,
+                            hd,n_slices,
                             0,0,0,0,0,0,0,0,0,0,0,0,0,
                             0,0,0,0,0,0,0,0,0,0,0,0,0,
                             0,0,0,0,0,0,0,0,0,0,0,0,0])
                 df_results = pd.DataFrame([result], columns=['PatientID','Age','Gender',
                                                             'TMT1','TMT2','Centile_iTMT',
                                                             'CSA_TM1','CSA_TM2','Centile_iCSA',
-                                                            "Slice_label","Hausdorff_distance_btw_TMs",
+                                                            "Slice_label","min_distance_btw_TMs","n_slices",
                                                             'volume1','volume_convexhull1','surface_area1','diameter_volume_equivalent1','diameter_surfacearea_equivalent1','width_3d_bb1','length_3d_bb1','height_3d_bb1','feret_3d_max1','feret_3d_min1','x_max_3d1','y_max_3d1','z_max_3d1',
                                                             'volume2','volume_convexhull2','surface_area2','diameter_volume_equivalent2','diameter_surfacearea_equivalent2','width_3d_bb2','length_3d_bb2','height_3d_bb2','feret_3d_max2','feret_3d_min2','x_max_3d2','y_max_3d2','z_max_3d2',
                                                              'volume','volume_convexhull','surface_area','diameter_volume_equivalent','diameter_surfacearea_equivalent','width_3d_bb','length_3d_bb','height_3d_bb','feret_3d_max','feret_3d_min','x_max_3d','y_max_3d','z_max_3d'])
@@ -618,7 +618,7 @@ def predict_itmt(age = 9, gender="M",
                 df_results = pd.DataFrame([result], columns=['PatientID','Age','Gender',
                                                             'TMT1','TMT2','Centile_iTMT',
                                                             'CSA_TM1','CSA_TM2','Centile_iCSA',
-                                                            "Slice_label","Hausdorff_distance_btw_TMs"])
+                                                            "Slice_label","min_distance_btw_TMs"])
             df_results.to_csv(path_to+"/"+patient_id+"_results.csv",index=False)
             print("Results saved to:",path_to+"/"+patient_id+"_results.csv")
             
