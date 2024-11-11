@@ -36,6 +36,9 @@ if __name__ == '__main__':
                         help = 'Path to metafile - only for multiple subjects')
     parser.add_argument('--enable_3d', '-3d',type = bool, default = False,
                         help = 'Enable 3d calculation')
+    parser.add_argument('--n_slices', '-3d_n_sl',type = int, default = 20,
+                        help = 'How many slices to take for 3d calculation')
+    
     
     args = parser.parse_args()
     itmt = predict_itmt(**vars(args))
