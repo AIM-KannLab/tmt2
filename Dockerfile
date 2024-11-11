@@ -25,7 +25,7 @@ RUN pip3 install --no-cache-dir --upgrade pip && \
     nilearn pandas \
     scipy numpy matplotlib tqdm imageio scikit-image \
     scikit-learn itk-elastix SimpleITK nibabel intensity-normalization[ants]\
-    wandb jupyter opencv-python  
+    wandb jupyter opencv-python imea
 
 RUN python3.9 -c "import tensorflow"
 
