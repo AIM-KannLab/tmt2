@@ -363,7 +363,7 @@ def predict_itmt(age = 9, gender="M",
         predictions = model_selection.predict(series_w)
         slice_label = get_slice_number_from_prediction(predictions)
         middle_slice = slice_label
-        N_thick = 50
+        N_thick = 10
         hd = 0
         
         print("Predicted slice:", slice_label)
@@ -375,23 +375,24 @@ def predict_itmt(age = 9, gender="M",
         infer_seg_array_3d_merged_filtered =  np.zeros(image_array.shape)
         
         if enable_3d:
-            if middle_slice>N_thick and middle_slice<np.shape(series_w)[0]-N_thick:
+            if middle_slice==0 or middle_slice==np.shape(image_array)[2]-1:
                 #wrong slice number, handle gracefully
                 print("Wrong slice number, skipping image")
                 result = np.array([patient_id,float(age),gender,
                             0, 0, 0,
                             0, 0, 0,
-                            slice_label, 
-                            0,
-                            0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-                            0,0,0,0,0,0,0,0,0,0,0,0,0,0])
+                            slice_label, 0,
+                            0,0,0,0,0,0,0,0,0,0,0,0,0,
+                            0,0,0,0,0,0,0,0,0,0,0,0,0,
+                            0,0,0,0,0,0,0,0,0,0,0,0,0])
                 
                 df_results = pd.DataFrame([result], columns=['PatientID','Age','Gender',
                                                                 'TMT1','TMT2','Centile_iTMT',
                                                                 'CSA_TM1','CSA_TM2','Centile_iCSA',
                                                                 "Slice_label","Hausdorff_distance_btw_TMs",
                                                                 "volume1","volume_convexhull1","surface_area1","diameter_volume_equivalent1","diameter_surfacearea_equivalent1","width_3d_bb1","length_3d_bb1","height_3d_bb1","feret_3d_max1","feret_3d_min1","x_max_3d1","y_max_3d1","z_max_3d1",
-                                                                "volume2","volume_convexhull2","surface_area2","diameter_volume_equivalent2","diameter_surfacearea_equivalent2","width_3d_bb2","length_3d_bb2","height_3d_bb2","feret_3d_max2","feret_3d_min2","x_max_3d2","y_max_3d2","z_max_3d2"])
+                                                                "volume2","volume_convexhull2","surface_area2","diameter_volume_equivalent2","diameter_surfacearea_equivalent2","width_3d_bb2","length_3d_bb2","height_3d_bb2","feret_3d_max2","feret_3d_min2","x_max_3d2","y_max_3d2","z_max_3d2",
+                                                                'volume","volume_convexhull","surface_area","diameter_volume_equivalent","diameter_surfacearea_equivalent","width_3d_bb","length_3d_bb","height_3d_bb","feret_3d_max","feret_3d_min","x_max_3d","y_max_3d","z_max_3d'])
                 df_results.to_csv(path_to+"/"+patient_id+"_results.csv",index=False)
                 continue
             else:
@@ -401,6 +402,10 @@ def predict_itmt(age = 9, gender="M",
             slices = [middle_slice]
             
         for slice_label in slices:
+            #check if slice is within the image
+            if slice_label<0 or slice_label>=np.shape(image_array)[2]:
+                print("Slice out of bounds, skipping slice")
+                continue
             image_array_2d = rescale(image_array[:,15:-21,slice_label], scaling_factor).reshape(1,target_size_unet[0],target_size_unet[1],1) 
             
             # create 4 images - half TMT and half empty           
@@ -465,14 +470,15 @@ def predict_itmt(age = 9, gender="M",
             result = im.copy()
             
             for cont in [cnt_1,cnt_2]: 
-                if len(cont)!=0:
+                #check if contour is integer
+                if type(cont) != int and len(cont)!=0:
                     if cv2.contourArea(cont) <= 1:
                         im_copy = cv2.drawContours(im_copy, [cont], -1, (0, 0, 255), -1)
                     else:
                         im_copy = cv2.drawContours(im_copy, [cont], -1, (51, 197, 255), -1)
             filled = cv2.addWeighted(im, alpha, im_copy, 1-alpha, 0)
             for cont in [cnt_1,cnt_2]: 
-                if len(cont)!=0:
+                if type(cont) != int and len(cont)!=0:
                     if cv2.contourArea(cont) <= 1:
                         result = cv2.drawContours(filled, [cont], -1, (0, 0, 255), 0)
                     else:
@@ -539,7 +545,7 @@ def predict_itmt(age = 9, gender="M",
                 print(np.shape(infer_seg_array_2d_1_filtered))
                 if np.sum(infer_seg_array_2d_1_filtered)>2 and np.sum(infer_seg_array_2d_2_filtered)>2:
                     hd = compute_distance_between_two_masks(image_array[:,15:-21,slice_label],infer_seg_array_2d_1_filtered,infer_seg_array_2d_2_filtered,
-                                                            new_path_to+"pic/contour_distance_visualization"+patient_id+".png")
+                                                            new_path_to+"/"+patient_id+"_"+str(slice_label)+'_contours.png')
                 else:
                     hd=0
                         
@@ -566,7 +572,7 @@ def predict_itmt(age = 9, gender="M",
                 m2= m2[m2.index !=1]
                 #save to csv
                 general_m1 = pd.concat([m1,m2],axis=0)
-                general_m1.to_csv(new_path_to+patient_id +"_3dmask_metrics.csv")
+                general_m1.to_csv(new_path_to+"/"+patient_id+'_3d_mask_metrics.csv')
                 #TODO: extract metrics from 3d masks
                 #volume	volume_convexhull	surface_area	diameter_volume_equivalent	diameter_surfacearea_equivalent	width_3d_bb	length_3d_bb	height_3d_bb	feret_3d_max	feret_3d_min	x_max_3d	y_max_3d	z_max_3d
                 result = np.array([patient_id,float(age),gender,
@@ -574,15 +580,33 @@ def predict_itmt(age = 9, gender="M",
                             CSA_PRED_TM1_line, CSA_PRED_TM2_line, centile_csa,
                             slice_label, 
                             hd,
-                            m1['volume1'],m1['volume_convexhull1'],m1['surface_area1'],m1['diameter_volume_equivalent1'],m1['diameter_surfacearea_equivalent1'],m1['width_3d_bb1'],m1['length_3d_bb1'],m1['height_3d_bb1'],m1['feret_3d_max1'],m1['feret_3d_min1'],m1['x_max_3d1'],m1['y_max_3d1'],m1['z_max_3d1'],
-                            m2['volume2'],m2['volume_convexhull2'],m2['surface_area2'],m2['diameter_volume_equivalent2'],m2['diameter_surfacearea_equivalent2'],m2['width_3d_bb2'],m2['length_3d_bb2'],m2['height_3d_bb2'],m2['feret_3d_max2'],m2['feret_3d_min2'],m2['x_max_3d2'],m2['y_max_3d2'],m2['z_max_3d2']])
+                            m1['volume'],m1['volume_convexhull'],m1['surface_area'],m1['diameter_volume_equivalent'],m1['diameter_surfacearea_equivalent'],m1['width_3d_bb'],m1['length_3d_bb'],m1['height_3d_bb'],m1['feret_3d_max'],m1['feret_3d_min'],m1['x_max_3d'],m1['y_max_3d'],m1['z_max_3d'],
+                            m2['volume'],m2['volume_convexhull'],m2['surface_area'],m2['diameter_volume_equivalent'],m2['diameter_surfacearea_equivalent'],m2['width_3d_bb'],m2['length_3d_bb'],m2['height_3d_bb'],m2['feret_3d_max'],m2['feret_3d_min'],m2['x_max_3d'],m2['y_max_3d'],m2['z_max_3d'],
+                            (m1['volume']+m2['volume'])/2, (m1['volume_convexhull']+m2['volume_convexhull'])/2, (m1['surface_area']+m2['surface_area'])/2, (m1['diameter_volume_equivalent']+m2['diameter_volume_equivalent'])/2, (m1['diameter_surfacearea_equivalent']+m2['diameter_surfacearea_equivalent'])/2, (m1['width_3d_bb']+m2['width_3d_bb'])/2, (m1['length_3d_bb']+m2['length_3d_bb'])/2, (m1['height_3d_bb']+m2['height_3d_bb'])/2, (m1['feret_3d_max']+m2['feret_3d_max'])/2, (m1['feret_3d_min']+m2['feret_3d_min'])/2, (m1['x_max_3d']+m2['x_max_3d'])/2, (m1['y_max_3d']+m2['y_max_3d'])/2, (m1['z_max_3d']+m2['z_max_3d'])/2])  
                 df_results = pd.DataFrame([result], columns=['PatientID','Age','Gender',
                                                             'TMT1','TMT2','Centile_iTMT',
                                                             'CSA_TM1','CSA_TM2','Centile_iCSA',
                                                             "Slice_label","Hausdorff_distance_btw_TMs",
                                                             'volume1','volume_convexhull1','surface_area1','diameter_volume_equivalent1','diameter_surfacearea_equivalent1','width_3d_bb1','length_3d_bb1','height_3d_bb1','feret_3d_max1','feret_3d_min1','x_max_3d1','y_max_3d1','z_max_3d1',
-                                                            'volume2','volume_convexhull2','surface_area2','diameter_volume_equivalent2','diameter_surfacearea_equivalent2','width_3d_bb2','length_3d_bb2','height_3d_bb2','feret_3d_max2','feret_3d_min2','x_max_3d2','y_max_3d2','z_max_3d2'])
-            else:
+                                                            'volume2','volume_convexhull2','surface_area2','diameter_volume_equivalent2','diameter_surfacearea_equivalent2','width_3d_bb2','length_3d_bb2','height_3d_bb2','feret_3d_max2','feret_3d_min2','x_max_3d2','y_max_3d2','z_max_3d2',
+                                                            'volume','volume_convexhull','surface_area','diameter_volume_equivalent','diameter_surfacearea_equivalent','width_3d_bb','length_3d_bb','height_3d_bb','feret_3d_max','feret_3d_min','x_max_3d','y_max_3d','z_max_3d'])
+            elif enable_3d==True:
+                result = np.array([patient_id,float(age),gender,
+                            objL_pred_minf, objR_pred_minf, centile_tmt,
+                            CSA_PRED_TM1_line, CSA_PRED_TM2_line, centile_csa,
+                            slice_label, 
+                            hd,
+                            0,0,0,0,0,0,0,0,0,0,0,0,0,
+                            0,0,0,0,0,0,0,0,0,0,0,0,0,
+                            0,0,0,0,0,0,0,0,0,0,0,0,0])
+                df_results = pd.DataFrame([result], columns=['PatientID','Age','Gender',
+                                                            'TMT1','TMT2','Centile_iTMT',
+                                                            'CSA_TM1','CSA_TM2','Centile_iCSA',
+                                                            "Slice_label","Hausdorff_distance_btw_TMs",
+                                                            'volume1','volume_convexhull1','surface_area1','diameter_volume_equivalent1','diameter_surfacearea_equivalent1','width_3d_bb1','length_3d_bb1','height_3d_bb1','feret_3d_max1','feret_3d_min1','x_max_3d1','y_max_3d1','z_max_3d1',
+                                                            'volume2','volume_convexhull2','surface_area2','diameter_volume_equivalent2','diameter_surfacearea_equivalent2','width_3d_bb2','length_3d_bb2','height_3d_bb2','feret_3d_max2','feret_3d_min2','x_max_3d2','y_max_3d2','z_max_3d2',
+                                                             'volume','volume_convexhull','surface_area','diameter_volume_equivalent','diameter_surfacearea_equivalent','width_3d_bb','length_3d_bb','height_3d_bb','feret_3d_max','feret_3d_min','x_max_3d','y_max_3d','z_max_3d'])
+            elif enable_3d==False:
                 result = np.array([patient_id,float(age),gender,
                             objL_pred_minf, objR_pred_minf, centile_tmt,
                             CSA_PRED_TM1_line, CSA_PRED_TM2_line, centile_csa,
