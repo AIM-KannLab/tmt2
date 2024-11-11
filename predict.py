@@ -235,7 +235,7 @@ def predict_itmt(age = 9, gender="M",
                  df_centile_girls_csv= 'percentiles_chart_girls.csv',
                  df_centile_girls_csv_csa ='percentiles_chart_girls_csa.csv',
                  df_centile_boys_csv_csa = 'percentiles_chart_boys_csa.csv',
-                 enable_3d=False):
+                 enable_3d=False, n_slices=50):
     
     # load image
     threshold = 0.75
@@ -363,7 +363,7 @@ def predict_itmt(age = 9, gender="M",
         predictions = model_selection.predict(series_w)
         slice_label = get_slice_number_from_prediction(predictions)
         middle_slice = slice_label
-        N_thick = 10
+        N_thick = n_slices
         hd = 0
         
         print("Predicted slice:", slice_label)
@@ -568,8 +568,10 @@ def predict_itmt(age = 9, gender="M",
             if enable_3d and slice_label==slices[-1]:
                 m1,m2=feret_3d(infer_seg_array_3d_1_filtered, infer_seg_array_3d_2_filtered)
                 #concat two df to the end of each other: m1 and m2
-                m1 = m1[m1.index !=1]
-                m2= m2[m2.index !=1]
+                #remove from m1 and m2 any additional rows except the first one
+                
+                m1 = m1.iloc[0]  # Keep only the first row of m1
+                m2 = m2.iloc[0]
                 #save to csv
                 general_m1 = pd.concat([m1,m2],axis=0)
                 general_m1.to_csv(new_path_to+"/"+patient_id+'_3d_mask_metrics.csv')
@@ -630,7 +632,6 @@ def predict_itmt(age = 9, gender="M",
     frame.to_csv(path_to+"/results.csv",index=False)
     
     print("All results saved to:",path_to+"/results.csv")
-    print("Files not processed due to metadata not found error:", ommited_files)
     
                     
                     
