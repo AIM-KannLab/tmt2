@@ -393,7 +393,7 @@ def predict_itmt(age = 9, gender="M",
                                                                 "volume1","volume_convexhull1","surface_area1","diameter_volume_equivalent1","diameter_surfacearea_equivalent1","width_3d_bb1","length_3d_bb1","height_3d_bb1","feret_3d_max1","feret_3d_min1","x_max_3d1","y_max_3d1","z_max_3d1",
                                                                 "volume2","volume_convexhull2","surface_area2","diameter_volume_equivalent2","diameter_surfacearea_equivalent2","width_3d_bb2","length_3d_bb2","height_3d_bb2","feret_3d_max2","feret_3d_min2","x_max_3d2","y_max_3d2","z_max_3d2",
                                                                 'volume","volume_convexhull","surface_area","diameter_volume_equivalent","diameter_surfacearea_equivalent","width_3d_bb","length_3d_bb","height_3d_bb","feret_3d_max","feret_3d_min","x_max_3d","y_max_3d","z_max_3d'])
-                df_results.to_csv(path_to+"/"+patient_id+"_results.csv",index=False)
+                df_results.to_csv(new_path_to+"/"+patient_id+"_error.csv",index=False)
                 continue
             else:
                 slices = [middle_slice + i for i in range(-N_thick, N_thick + 1)]
@@ -573,10 +573,6 @@ def predict_itmt(age = 9, gender="M",
                 m1 = m1.iloc[0]  # Keep only the first row of m1
                 m2 = m2.iloc[0]
                 #save to csv
-                general_m1 = pd.concat([m1,m2],axis=0)
-                general_m1.to_csv(new_path_to+"/"+patient_id+'_3d_mask_metrics.csv')
-                #TODO: extract metrics from 3d masks
-                #volume	volume_convexhull	surface_area	diameter_volume_equivalent	diameter_surfacearea_equivalent	width_3d_bb	length_3d_bb	height_3d_bb	feret_3d_max	feret_3d_min	x_max_3d	y_max_3d	z_max_3d
                 result = np.array([patient_id,float(age),gender,
                             objL_pred_minf, objR_pred_minf, centile_tmt,
                             CSA_PRED_TM1_line, CSA_PRED_TM2_line, centile_csa,
@@ -592,6 +588,8 @@ def predict_itmt(age = 9, gender="M",
                                                             'volume1','volume_convexhull1','surface_area1','diameter_volume_equivalent1','diameter_surfacearea_equivalent1','width_3d_bb1','length_3d_bb1','height_3d_bb1','feret_3d_max1','feret_3d_min1','x_max_3d1','y_max_3d1','z_max_3d1',
                                                             'volume2','volume_convexhull2','surface_area2','diameter_volume_equivalent2','diameter_surfacearea_equivalent2','width_3d_bb2','length_3d_bb2','height_3d_bb2','feret_3d_max2','feret_3d_min2','x_max_3d2','y_max_3d2','z_max_3d2',
                                                             'volume','volume_convexhull','surface_area','diameter_volume_equivalent','diameter_surfacearea_equivalent','width_3d_bb','length_3d_bb','height_3d_bb','feret_3d_max','feret_3d_min','x_max_3d','y_max_3d','z_max_3d'])
+                df_results.to_csv(new_path_to+"/"+patient_id+"_"+str(slice_label)+"_3d.csv",index=False)
+                
             elif enable_3d==True:
                 result = np.array([patient_id,float(age),gender,
                             objL_pred_minf, objR_pred_minf, centile_tmt,
@@ -608,6 +606,8 @@ def predict_itmt(age = 9, gender="M",
                                                             'volume1','volume_convexhull1','surface_area1','diameter_volume_equivalent1','diameter_surfacearea_equivalent1','width_3d_bb1','length_3d_bb1','height_3d_bb1','feret_3d_max1','feret_3d_min1','x_max_3d1','y_max_3d1','z_max_3d1',
                                                             'volume2','volume_convexhull2','surface_area2','diameter_volume_equivalent2','diameter_surfacearea_equivalent2','width_3d_bb2','length_3d_bb2','height_3d_bb2','feret_3d_max2','feret_3d_min2','x_max_3d2','y_max_3d2','z_max_3d2',
                                                              'volume','volume_convexhull','surface_area','diameter_volume_equivalent','diameter_surfacearea_equivalent','width_3d_bb','length_3d_bb','height_3d_bb','feret_3d_max','feret_3d_min','x_max_3d','y_max_3d','z_max_3d'])
+                df_results.to_csv(new_path_to+"/"+patient_id+"_"+str(slice_label)+"_results_3d_temp.csv",index=False)
+                
             elif enable_3d==False:
                 result = np.array([patient_id,float(age),gender,
                             objL_pred_minf, objR_pred_minf, centile_tmt,
@@ -619,19 +619,41 @@ def predict_itmt(age = 9, gender="M",
                                                             'TMT1','TMT2','Centile_iTMT',
                                                             'CSA_TM1','CSA_TM2','Centile_iCSA',
                                                             "Slice_label","min_distance_btw_TMs"])
-            df_results.to_csv(path_to+"/"+patient_id+"_results.csv",index=False)
-            print("Results saved to:",path_to+"/"+patient_id+"_results.csv")
+                df_results.to_csv(new_path_to+"/"+patient_id+"_"+str(slice_label)+"_results.csv",index=False)
+                print("Results saved to:",new_path_to+"/"+patient_id+"_results.csv")
             
     # concatenate all results .csv files into one
-    all_files = glob.glob(path_to+"/*_results.csv")
+    all_files = glob.glob(new_path_to+"/*_results.csv")
     li = []
     for filename in all_files:
         df = pd.read_csv(filename, index_col=None, header=0)
         li.append(df)
     frame = pd.concat(li, axis=0, ignore_index=True)
-    frame.to_csv(path_to+"/results.csv",index=False)
+    frame.to_csv(path_to+"/_results2d.csv",index=False)
     
-    print("All results saved to:",path_to+"/results.csv")
+    print("All 2D results saved to:",path_to+"/_results2d.csv")
+    
+    # concatenate all results .csv files into one
+    all_files = glob.glob(new_path_to+"/*_results_3d_temp.csv")
+    li = []
+    for filename in all_files:
+        df = pd.read_csv(filename, index_col=None, header=0)
+        li.append(df)
+    frame = pd.concat(li, axis=0, ignore_index=True)
+    frame.to_csv(path_to+"/_results_all_3d.csv",index=False)
+    
+    print("All 3d results saved to:",path_to+"/_results_all_3d.csv")
+    
+    # concatenate all results .csv files into one
+    all_files = glob.glob(new_path_to+"/*_3d.csv")
+    li = []
+    for filename in all_files:
+        df = pd.read_csv(filename, index_col=None, header=0)
+        li.append(df)
+    frame = pd.concat(li, axis=0, ignore_index=True)
+    frame.to_csv(path_to+"/_middle_only_3d.csv",index=False)
+    
+    print("only middle slice + 3d results saved to:",path_to+"/_middle_only_3d.csv")
     
                     
-                    
+                  
