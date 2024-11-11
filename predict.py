@@ -17,6 +17,9 @@ from skimage.transform import resize,rescale
 import cv2
 import itk
 import subprocess
+from skimage import measure
+from scipy.spatial.distance import cdist
+import imea
 from intensity_normalization.typing import Modality, TissueType
 from intensity_normalization.normalize.zscore import ZScoreNormalize
 
@@ -81,18 +84,18 @@ def compute_crop_line(img_input,infer_seg_array_2d_1,infer_seg_array_2d_2):
 def find_exact_centile(input_tmt, age, df):
     # Find closest age 
     val,i = closest_value(df['x'], age)
-    # Extract centile columns
+    # Extract centile_tmt columns
     cents = ['X'+str(x) for x in range(1,100)]
     # Use loc to get series
     df_cent = df.iloc[i].loc[cents] 
     val,i = closest_value(df_cent, input_tmt)
     # Sort
-    centile = df_cent.index[i].replace('X','')
-    if centile == '1':
-        centile = '<1'
-    if centile == '99':
-        centile = '>99'
-    return centile
+    centile_tmt = df_cent.index[i].replace('X','')
+    if centile_tmt == '1':
+        centile_tmt = '<1'
+    if centile_tmt == '99':
+        centile_tmt = '>99'
+    return centile_tmt
  
 # function to select the correct MRI template based on the age  
 def select_template_based_on_age(age):
@@ -127,7 +130,78 @@ def register_to_template(input_image_path, output_path, fixed_image_path,rename_
         except:
             print("Cannot transform", rename_id)
            
-             
+
+def compute_distance_between_two_masks(image_array, infer_seg_array_3d_1_filtered, infer_seg_array_3d_2_filtered, 
+                                       save_path):
+    # Remove singleton dimensions to make arrays 2D
+    infer_seg_array1 = np.squeeze(infer_seg_array_3d_1_filtered)
+    infer_seg_array2 = np.squeeze(infer_seg_array_3d_2_filtered)
+    
+    # Find contours of each mask
+    contours_1 = measure.find_contours(infer_seg_array1, 0.5)
+    contours_2 = measure.find_contours(infer_seg_array2, 0.5)
+    
+    # Flatten the list of contours and get coordinates as points
+    points_1 = np.concatenate(contours_1)
+    points_2 = np.concatenate(contours_2)
+    
+    # Calculate pairwise distances
+    d_1_to_2 = cdist(points_1, points_2)
+    
+    # Closest Distance calculation
+    min_distance = d_1_to_2.min()  # Closest distance between any points on the contours
+    min_idx = np.unravel_index(np.argmin(d_1_to_2), d_1_to_2.shape)  # Index of the closest points
+    closest_point_1 = points_1[min_idx[0]]
+    closest_point_2 = points_2[min_idx[1]]
+    
+    # Visualization
+    plt.figure(figsize=(8, 8))
+    plt.imshow(image_array, cmap='gray')
+    
+    # Plot contours for mask 1 and mask 2 without conditional labels
+    for contour in contours_1:
+        plt.plot(contour[:, 1], contour[:, 0], 'r', linewidth=2)  # Mask 1
+    for contour in contours_2:
+        plt.plot(contour[:, 1], contour[:, 0], 'b', linewidth=2)  # Mask 2
+    
+    # Draw line for the closest distance
+    plt.plot([closest_point_1[1], closest_point_2[1]], [closest_point_1[0], closest_point_2[0]], 'y-', linewidth=2, label="Closest Distance")
+    
+    # Add legend items manually after plotting
+    plt.plot([], [], 'r', label="Mask 1")
+    plt.plot([], [], 'b', label="Mask 2")
+    plt.plot([], [], 'y-', label="Closest Distance")
+
+    # Annotate the distances
+    plt.text(10, 10, f"Closest Distance: {min_distance:.2f}", color='white', fontsize=12, bbox=dict(facecolor='black', alpha=0.5))
+    
+    # Show the legend and save
+    plt.legend()
+    plt.axis("off")
+    plt.savefig(save_path, bbox_inches='tight', pad_inches=0.1)
+    plt.close()
+    
+    return min_distance
+
+
+def feret_3d(infer_seg_array_3d_1_filtered, infer_seg_array_3d_2_filtered, 
+             threshold_mm=0.5, 
+             spatial_resolution_xy=1, 
+             spatial_resolution_z=1):
+    # Calculate 3D shape measurements for the first mask
+    img_1 = np.max(infer_seg_array_3d_1_filtered, axis=0)
+    img_2 = np.max(infer_seg_array_3d_2_filtered, axis=0)
+    
+    df_2d_1, df_3d_1  = imea.extract.shape_measurements_3d(img_1, threshold_mm, spatial_resolution_xy, spatial_resolution_z, dalpha=9, min_object_area=10, n_objects_max=-1)
+    df_2d_2, df_3d_2  = imea.extract.shape_measurements_3d(img_2, threshold_mm, spatial_resolution_xy, spatial_resolution_z, dalpha=9, min_object_area=10, n_objects_max=-1)
+    # Extract relevant metrics for mask 1
+    
+    print(type(df_3d_1))
+    
+    print("Mask 1 Metrics:", df_3d_1)
+    print("Mask 2 Metrics:", df_3d_2)
+    
+    return df_3d_1,df_3d_2           
              
 # helper function to find the closest value in a list 
 def closest_value(input_list, input_value):
@@ -158,7 +232,10 @@ def predict_itmt(age = 9, gender="M",
                  model_weight_path_selection = 'model_weights/densenet_itmt2.hdf5',
                  model_weight_path_segmentation = 'model_weights/unet_itmt2.hdf5',
                  df_centile_boys_csv = 'percentiles_chart_boys.csv',
-                 df_centile_girls_csv= 'percentiles_chart_girls.csv'):
+                 df_centile_girls_csv= 'percentiles_chart_girls.csv',
+                 df_centile_girls_csv_csa ='percentiles_chart_girls_csa.csv',
+                 df_centile_boys_csv_csa = 'percentiles_chart_boys_csa.csv',
+                 enable_3d=False):
     
     # load image
     threshold = 0.75
@@ -256,7 +333,6 @@ def predict_itmt(age = 9, gender="M",
         cmd_line = "zscore-normalize "+new_path_to+"/no_z/registered_no_z.nii -o "+new_path_to+'/registered_z.nii'
         subprocess.getoutput(cmd_line)    
 
-
         image_sitk = sitk.ReadImage(new_path_to+'/registered_z.nii')    
         windowed_images  = sitk.GetArrayFromImage(image_sitk)           
 
@@ -286,156 +362,240 @@ def predict_itmt(age = 9, gender="M",
         # predict slice  
         predictions = model_selection.predict(series_w)
         slice_label = get_slice_number_from_prediction(predictions)
+        middle_slice = slice_label
+        N_thick = 50
+        hd = 0
+        
         print("Predicted slice:", slice_label)
 
         img = nib.load(new_path_to+'/registered_z.nii')  
         image_array, affine = img.get_fdata(), img.affine
         infer_seg_array_3d_1,infer_seg_array_3d_2 = np.zeros(image_array.shape),np.zeros(image_array.shape)
-        
-        # rescale image into 512x512 for unet 
-        image_array_2d = rescale(image_array[:,15:-21,slice_label], scaling_factor).reshape(1,target_size_unet[0],target_size_unet[1],1) 
-        
-        # create 4 images - half TMT and half empty           
-        img_half_11 = np.concatenate((image_array_2d[:,:256,:,:],np.zeros_like(image_array_2d[:,:256,:,:])),axis=1)
-        img_half_21 = np.concatenate((np.zeros_like(image_array_2d[:,:256,:,:]),image_array_2d[:,:256,:,:]),axis=1)
-        img_half_12 = np.concatenate((np.zeros_like(image_array_2d[:,256:,:,:]),image_array_2d[:,256:,:,:]),axis=1)
-        img_half_22 = np.concatenate((image_array_2d[:,256:,:,:],np.zeros_like(image_array_2d[:,256:,:,:])),axis=1)
-
-        flipped = np.flip(image_array_2d, axis=1)
-
-        flipped_11 = np.concatenate((flipped[:,:256,:,:],np.zeros_like(flipped[:,:256,:,:])),axis=1)
-        flipped_21 = np.concatenate((np.zeros_like(flipped[:,:256,:,:]),flipped[:,:256,:,:]),axis=1)
-        flipped_12 = np.concatenate((np.zeros_like(flipped[:,256:,:,:]),flipped[:,256:,:,:]),axis=1)
-        flipped_22 = np.concatenate((flipped[:,256:,:,:],np.zeros_like(flipped[:,256:,:,:])),axis=1)
-
-        list_of_left_muscle = [img_half_11, img_half_21, flipped_12, flipped_22]
-        list_of_right_muscle = [img_half_12,img_half_22, flipped_11, flipped_21]
-
-        list_of_left_muscle_preds = []
-        list_of_right_muscle_preds = []
-
-        # predict left and right muscle on each of 4 images
-        for image in list_of_left_muscle: 
-            infer_seg_array = model_unet.predict(image)
-            muscle_seg = infer_seg_array[:,:,:,1].reshape(1,target_size_unet[0],target_size_unet[1],1)               
-            list_of_left_muscle_preds.append(muscle_seg)
-                            
-        for image in list_of_right_muscle: 
-            infer_seg_array = model_unet.predict(image)
-            muscle_seg = infer_seg_array[:,:,:,1].reshape(1,target_size_unet[0],target_size_unet[1],1)             
-            list_of_right_muscle_preds.append(muscle_seg)
-                        
-        list_of_left_muscle_preds_halved = [list_of_left_muscle_preds[0][:,:256,:,:],
-                                            list_of_left_muscle_preds[1][:,256:,:,:],
-                                            np.flip(list_of_left_muscle_preds[2][:,256:,:,:],axis=1),
-                                            np.flip(list_of_left_muscle_preds[3][:,:256,:,:],axis=1)]
-
-        list_of_right_muscle_preds_halved = [list_of_right_muscle_preds[0][:,256:,:,:],
-                                            list_of_right_muscle_preds[1][:,:256,:,:],
-                                            np.flip(list_of_right_muscle_preds[2][:,:256,:,:],axis=1),
-                                            np.flip(list_of_right_muscle_preds[3][:,256:,:,:],axis=1)]
-        
-        # average predictions and threshold              
-        left_half_result = np.mean(list_of_left_muscle_preds_halved, axis=0)<=threshold # <>
-        right_half_result = np.mean(list_of_right_muscle_preds_halved, axis=0)<=threshold # <>
-        muscle_seg_1 = np.concatenate((left_half_result,np.zeros_like(left_half_result)),axis=1)
-        muscle_seg_2 = np.concatenate((np.zeros_like(left_half_result),right_half_result),axis=1)
-
         infer_seg_array_3d_1_filtered,infer_seg_array_3d_2_filtered = np.zeros(image_array.shape),np.zeros(image_array.shape)
         infer_seg_array_3d_merged_filtered =  np.zeros(image_array.shape)
-                
-        # filter islands
-        muscle_seg_1_filtered, area_1, cnt_1 = filter_islands(muscle_seg_1[0])
-        muscle_seg_2_filtered, area_2, cnt_2 = filter_islands(muscle_seg_2[0])
-
-        # save plots 
-        fg = plt.figure(figsize=(5, 5), facecolor='k')
-        I = cv2.normalize(image_array_2d[0], None, 255, 0, cv2.NORM_MINMAX, cv2.CV_8U)
-        cv2.imwrite(new_path_to+"/"+patient_id+"_no_masks.png", I)
-        im = cv2.imread(new_path_to+"/"+patient_id+"_no_masks.png")                        
-        im_copy = im.copy()        
-        result = im.copy()
-        for cont in [cnt_1,cnt_2]: 
-            if len(cont)!=0:
-                if cv2.contourArea(cont) <= 1:
-                    im_copy = cv2.drawContours(im_copy, [cont], -1, (0, 0, 255), -1)
-                else:
-                    im_copy = cv2.drawContours(im_copy, [cont], -1, (51, 197, 255), -1)
-        filled = cv2.addWeighted(im, alpha, im_copy, 1-alpha, 0)
-        for cont in [cnt_1,cnt_2]: 
-            if len(cont)!=0:
-                if cv2.contourArea(cont) <= 1:
-                    result = cv2.drawContours(filled, [cont], -1, (0, 0, 255), 0)
-                else:
-                    result = cv2.drawContours(filled, [cont], -1, (51, 197, 255), 0)
-
-        cv2.imwrite(new_path_to+"/"+patient_id+"_mask.png", result)
-                
-        # rescale for the unet
-        infer_seg_array_2d_1_filtered = rescale(muscle_seg_1_filtered,1/scaling_factor)
-        infer_seg_array_2d_2_filtered = rescale(muscle_seg_2_filtered,1/scaling_factor)
-
-        # save to 3d
-        infer_seg_array_3d_1_filtered[:,:,slice_label] = np.pad(infer_seg_array_2d_1_filtered[:,:,0],[[0,0],[15,21]],'constant',constant_values=0)
-        infer_seg_array_3d_2_filtered[:,:,slice_label] = np.pad(infer_seg_array_2d_2_filtered[:,:,0],[[0,0],[15,21]],'constant',constant_values=0)
-                    
-        concated = np.concatenate((infer_seg_array_2d_1_filtered[:100,:,0],infer_seg_array_2d_2_filtered[100:,:,0]),axis=0)    
-        infer_seg_array_3d_merged_filtered[:,:,slice_label] = np.pad(concated,[[0,0],[15,21]],'constant',constant_values=0)
         
-        infer_3d_path = new_path_to+"/"+patient_id+'mask.nii.gz'
-        save_nii(infer_seg_array_3d_merged_filtered, infer_3d_path, affine)
+        if enable_3d:
+            if middle_slice>N_thick and middle_slice<np.shape(series_w)[0]-N_thick:
+                #wrong slice number, handle gracefully
+                print("Wrong slice number, skipping image")
+                result = np.array([patient_id,float(age),gender,
+                            0, 0, 0,
+                            0, 0, 0,
+                            slice_label, 
+                            0,
+                            0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                            0,0,0,0,0,0,0,0,0,0,0,0,0,0])
+                
+                df_results = pd.DataFrame([result], columns=['PatientID','Age','Gender',
+                                                                'TMT1','TMT2','Centile_iTMT',
+                                                                'CSA_TM1','CSA_TM2','Centile_iCSA',
+                                                                "Slice_label","Hausdorff_distance_btw_TMs",
+                                                                "volume1","volume_convexhull1","surface_area1","diameter_volume_equivalent1","diameter_surfacearea_equivalent1","width_3d_bb1","length_3d_bb1","height_3d_bb1","feret_3d_max1","feret_3d_min1","x_max_3d1","y_max_3d1","z_max_3d1",
+                                                                "volume2","volume_convexhull2","surface_area2","diameter_volume_equivalent2","diameter_surfacearea_equivalent2","width_3d_bb2","length_3d_bb2","height_3d_bb2","feret_3d_max2","feret_3d_min2","x_max_3d2","y_max_3d2","z_max_3d2"])
+                df_results.to_csv(path_to+"/"+patient_id+"_results.csv",index=False)
+                continue
+            else:
+                slices = [middle_slice + i for i in range(-N_thick, N_thick + 1)]
+                slices = sorted(slices, key=lambda x: abs(x - middle_slice))
+        else:
+            slices = [middle_slice]
             
-        objL_pred_minf_line, objR_pred_minf_line, objL_pred_minf, objR_pred_minf = 0,0,0,0
-                        
-        crop_line = compute_crop_line(image_array[:,15:-21,slice_label],infer_seg_array_2d_1_filtered,infer_seg_array_2d_2_filtered)
-                        
-        if np.sum(infer_seg_array_3d_1_filtered[:100,:,slice_label])>2:
-            objL_pred_minf = round(Calculater(infer_seg_array_3d_1_filtered[:100,:,slice_label], edge=True).minf,2)
+        for slice_label in slices:
+            image_array_2d = rescale(image_array[:,15:-21,slice_label], scaling_factor).reshape(1,target_size_unet[0],target_size_unet[1],1) 
+            
+            # create 4 images - half TMT and half empty           
+            img_half_11 = np.concatenate((image_array_2d[:,:256,:,:],np.zeros_like(image_array_2d[:,:256,:,:])),axis=1)
+            img_half_21 = np.concatenate((np.zeros_like(image_array_2d[:,:256,:,:]),image_array_2d[:,:256,:,:]),axis=1)
+            img_half_12 = np.concatenate((np.zeros_like(image_array_2d[:,256:,:,:]),image_array_2d[:,256:,:,:]),axis=1)
+            img_half_22 = np.concatenate((image_array_2d[:,256:,:,:],np.zeros_like(image_array_2d[:,256:,:,:])),axis=1)
 
-        if np.sum(infer_seg_array_3d_2_filtered[100:,:,slice_label])>2:
-            objR_pred_minf = round(Calculater(infer_seg_array_3d_2_filtered[100:,:,slice_label], edge=True).minf,2)
-                    
-        CSA_PRED_TM1 = np.sum(infer_seg_array_3d_1_filtered[:100,:,slice_label])
-        CSA_PRED_TM2 = np.sum(infer_seg_array_3d_2_filtered[100:,:,slice_label])
+            flipped = np.flip(image_array_2d, axis=1)
+
+            flipped_11 = np.concatenate((flipped[:,:256,:,:],np.zeros_like(flipped[:,:256,:,:])),axis=1)
+            flipped_21 = np.concatenate((np.zeros_like(flipped[:,:256,:,:]),flipped[:,:256,:,:]),axis=1)
+            flipped_12 = np.concatenate((np.zeros_like(flipped[:,256:,:,:]),flipped[:,256:,:,:]),axis=1)
+            flipped_22 = np.concatenate((flipped[:,256:,:,:],np.zeros_like(flipped[:,256:,:,:])),axis=1)
+
+            list_of_left_muscle = [img_half_11, img_half_21, flipped_12, flipped_22]
+            list_of_right_muscle = [img_half_12,img_half_22, flipped_11, flipped_21]
+
+            list_of_left_muscle_preds = []
+            list_of_right_muscle_preds = []
+
+            # predict left and right muscle on each of 4 images
+            for image in list_of_left_muscle: 
+                infer_seg_array = model_unet.predict(image)
+                muscle_seg = infer_seg_array[:,:,:,1].reshape(1,target_size_unet[0],target_size_unet[1],1)               
+                list_of_left_muscle_preds.append(muscle_seg)
+                                
+            for image in list_of_right_muscle: 
+                infer_seg_array = model_unet.predict(image)
+                muscle_seg = infer_seg_array[:,:,:,1].reshape(1,target_size_unet[0],target_size_unet[1],1)             
+                list_of_right_muscle_preds.append(muscle_seg)
                             
-        if np.sum(infer_seg_array_3d_1_filtered[:100,int(crop_line):,slice_label])>2:
-            objL_pred_minf_line = round(Calculater(infer_seg_array_3d_1_filtered[:100,int(crop_line):,slice_label], edge=True).minf,2)
+            list_of_left_muscle_preds_halved = [list_of_left_muscle_preds[0][:,:256,:,:],
+                                                list_of_left_muscle_preds[1][:,256:,:,:],
+                                                np.flip(list_of_left_muscle_preds[2][:,256:,:,:],axis=1),
+                                                np.flip(list_of_left_muscle_preds[3][:,:256,:,:],axis=1)]
 
-        if np.sum(infer_seg_array_3d_2_filtered[100:,int(crop_line):,slice_label])>2:
-            objR_pred_minf_line = round(Calculater(infer_seg_array_3d_2_filtered[100:,int(crop_line):,slice_label], edge=True).minf,2)
+            list_of_right_muscle_preds_halved = [list_of_right_muscle_preds[0][:,256:,:,:],
+                                                list_of_right_muscle_preds[1][:,:256,:,:],
+                                                np.flip(list_of_right_muscle_preds[2][:,:256,:,:],axis=1),
+                                                np.flip(list_of_right_muscle_preds[3][:,256:,:,:],axis=1)]
+            
+            # average predictions and threshold              
+            left_half_result = np.mean(list_of_left_muscle_preds_halved, axis=0)<=threshold # <>
+            right_half_result = np.mean(list_of_right_muscle_preds_halved, axis=0)<=threshold # <>
+            muscle_seg_1 = np.concatenate((left_half_result,np.zeros_like(left_half_result)),axis=1)
+            muscle_seg_2 = np.concatenate((np.zeros_like(left_half_result),right_half_result),axis=1)
+
+            infer_seg_array_3d_1_filtered,infer_seg_array_3d_2_filtered = np.zeros(image_array.shape),np.zeros(image_array.shape)
+            infer_seg_array_3d_merged_filtered =  np.zeros(image_array.shape)
+                    
+            # filter islands
+            muscle_seg_1_filtered, area_1, cnt_1 = filter_islands(muscle_seg_1[0])
+            muscle_seg_2_filtered, area_2, cnt_2 = filter_islands(muscle_seg_2[0])
+
+            # save plots 
+            fg = plt.figure(figsize=(5, 5), facecolor='k')
+            I = cv2.normalize(image_array_2d[0], None, 255, 0, cv2.NORM_MINMAX, cv2.CV_8U)
+            cv2.imwrite(new_path_to+"/"+patient_id+"_"+str(slice_label)+"_no_masks.png", I)
+            im = cv2.imread(new_path_to+"/"+patient_id+"_"+str(slice_label)+"_no_masks.png")                        
+            im_copy = im.copy()        
+            result = im.copy()
+            
+            for cont in [cnt_1,cnt_2]: 
+                if len(cont)!=0:
+                    if cv2.contourArea(cont) <= 1:
+                        im_copy = cv2.drawContours(im_copy, [cont], -1, (0, 0, 255), -1)
+                    else:
+                        im_copy = cv2.drawContours(im_copy, [cont], -1, (51, 197, 255), -1)
+            filled = cv2.addWeighted(im, alpha, im_copy, 1-alpha, 0)
+            for cont in [cnt_1,cnt_2]: 
+                if len(cont)!=0:
+                    if cv2.contourArea(cont) <= 1:
+                        result = cv2.drawContours(filled, [cont], -1, (0, 0, 255), 0)
+                    else:
+                        result = cv2.drawContours(filled, [cont], -1, (51, 197, 255), 0)
+
+            cv2.imwrite(new_path_to+"/"+patient_id+"_"+str(slice_label)+"_mask.png", result)
+                    
+            # rescale for the unet
+            infer_seg_array_2d_1_filtered = rescale(muscle_seg_1_filtered,1/scaling_factor)
+            infer_seg_array_2d_2_filtered = rescale(muscle_seg_2_filtered,1/scaling_factor)
+
+            # save to 3d
+            infer_seg_array_3d_1_filtered[:,:,slice_label] = np.pad(infer_seg_array_2d_1_filtered[:,:,0],[[0,0],[15,21]],'constant',constant_values=0)
+            infer_seg_array_3d_2_filtered[:,:,slice_label] = np.pad(infer_seg_array_2d_2_filtered[:,:,0],[[0,0],[15,21]],'constant',constant_values=0)
                         
-        CSA_PRED_TM1_line = np.sum(infer_seg_array_3d_1_filtered[:100,int(crop_line):,slice_label])
-        CSA_PRED_TM2_line = np.sum(infer_seg_array_3d_2_filtered[100:,int(crop_line):,slice_label])
-        
-        if objL_pred_minf > objR_pred_minf/2:
-            input_tmt = objL_pred_minf
-        elif objR_pred_minf>objL_pred_minf/2:
-            input_tmt = objR_pred_minf
-        else:
-            input_tmt = (objL_pred_minf+objR_pred_minf)/2
+            concated = np.concatenate((infer_seg_array_2d_1_filtered[:100,:,0],infer_seg_array_2d_2_filtered[100:,:,0]),axis=0)    
+            infer_seg_array_3d_merged_filtered[:,:,slice_label] = np.pad(concated,[[0,0],[15,21]],'constant',constant_values=0)
             
-        print("Age:",str(age)," Gender:",gender)
-        print("iTMT[mm]:", input_tmt)
-        print("Slice label:",slice_label)
-        
-        # centiles estimation
-        df_centile_boys = pd.read_csv(df_centile_boys_csv,header=0)
-        df_centile_girls = pd.read_csv(df_centile_girls_csv,header=0)
-        if gender =='F' or gender=='Female' or gender=='f' or gender=='F':
-            centile = find_exact_centile(input_tmt, round(float(age),2), df_centile_girls)
+            infer_3d_path = new_path_to+"/"+patient_id+"_"+str(slice_label)+'mask.nii.gz'
+            if slice_label==slices[-1] or enable_3d==False:
+                save_nii(infer_seg_array_3d_merged_filtered, infer_3d_path, affine)
+                
+            objL_pred_minf_line, objR_pred_minf_line, objL_pred_minf, objR_pred_minf = 0,0,0,0
+                            
+            crop_line = compute_crop_line(image_array[:,15:-21,slice_label],infer_seg_array_2d_1_filtered,infer_seg_array_2d_2_filtered)
+                            
+            if np.sum(infer_seg_array_3d_1_filtered[:100,:,slice_label])>2:
+                objL_pred_minf = round(Calculater(infer_seg_array_3d_1_filtered[:100,:,slice_label], edge=True).minf,2)
+
+            if np.sum(infer_seg_array_3d_2_filtered[100:,:,slice_label])>2:
+                objR_pred_minf = round(Calculater(infer_seg_array_3d_2_filtered[100:,:,slice_label], edge=True).minf,2)
+                        
+            CSA_PRED_TM1 = np.sum(infer_seg_array_3d_1_filtered[:100,:,slice_label])
+            CSA_PRED_TM2 = np.sum(infer_seg_array_3d_2_filtered[100:,:,slice_label])
+                                
+            if np.sum(infer_seg_array_3d_1_filtered[:100,int(crop_line):,slice_label])>2:
+                objL_pred_minf_line = round(Calculater(infer_seg_array_3d_1_filtered[:100,int(crop_line):,slice_label], edge=True).minf,2)
+
+            if np.sum(infer_seg_array_3d_2_filtered[100:,int(crop_line):,slice_label])>2:
+                objR_pred_minf_line = round(Calculater(infer_seg_array_3d_2_filtered[100:,int(crop_line):,slice_label], edge=True).minf,2)
+                            
+            CSA_PRED_TM1_line = np.sum(infer_seg_array_3d_1_filtered[:100,int(crop_line):,slice_label])
+            CSA_PRED_TM2_line = np.sum(infer_seg_array_3d_2_filtered[100:,int(crop_line):,slice_label])
+            input_csa= (CSA_PRED_TM1_line+CSA_PRED_TM2_line)/2
+            '''
+            if objL_pred_minf > objR_pred_minf/2:
+                input_tmt = objL_pred_minf
+            elif objR_pred_minf>objL_pred_minf/2:
+                input_tmt = objR_pred_minf
+            else:
+                input_tmt = (objL_pred_minf+objR_pred_minf)/2
+            '''
+            if objL_pred_minf >= objR_pred_minf * 1.5:
+                input_tmt = objL_pred_minf
+            elif objR_pred_minf >= objL_pred_minf * 1.5:
+                input_tmt = objR_pred_minf
+            else:
+                input_tmt = (objL_pred_minf+objR_pred_minf)/2
+                
+            print("Age:",str(age)," Gender:",gender)
+            print("iTMT[mm]:", input_tmt)
+            print("Slice label:",slice_label)
+            if slice_label==middle_slice:
+                print(np.shape(infer_seg_array_2d_1_filtered))
+                if np.sum(infer_seg_array_2d_1_filtered)>2 and np.sum(infer_seg_array_2d_2_filtered)>2:
+                    hd = compute_distance_between_two_masks(image_array[:,15:-21,slice_label],infer_seg_array_2d_1_filtered,infer_seg_array_2d_2_filtered,
+                                                            new_path_to+"pic/contour_distance_visualization"+patient_id+".png")
+                else:
+                    hd=0
+                        
+            # centiles estimation
+            df_centile_boys = pd.read_csv(df_centile_boys_csv,header=0)
+            df_centile_girls = pd.read_csv(df_centile_girls_csv,header=0)
+            df_centile_boys_csa = pd.read_csv(df_centile_boys_csv_csa,header=0)
+            df_centile_girls_csa = pd.read_csv(df_centile_girls_csv_csa,header=0)
             
-        else:
-            centile = find_exact_centile(input_tmt, round(float(age),2), df_centile_boys)
-        print("Centile:",centile)  
-        # save results
-        result = np.array([patient_id,float(age),gender,
-                        input_tmt, centile,
-                        CSA_PRED_TM1,CSA_PRED_TM2, objL_pred_minf, objR_pred_minf,slice_label])
-        
-        df_results = pd.DataFrame([result], columns=['PatientID','Age','Gender','iTMT','Centile','CSA_TM1','CSA_TM2','TMT1','TMT2',"Slice_label"])
-        df_results.to_csv(path_to+"/"+patient_id+"_results.csv",index=False)
-        print("Results saved to:",path_to+"/"+patient_id+"_results.csv")
-        
+            if gender =='F' or gender=='Female' or gender=='f' or gender=='F':
+                centile_tmt = find_exact_centile(input_tmt, round(float(age),2), df_centile_girls)
+                centile_csa = find_exact_centile(input_csa, round(float(age),2), df_centile_girls_csa)
+    
+            else:
+                centile_tmt = find_exact_centile(input_tmt, round(float(age),2), df_centile_boys)
+                centile_tmt = find_exact_centile(input_csa, round(float(age),2), df_centile_boys_csa)
+            print("iTMT Centile:",centile_tmt)  
+            # save results
+            #if enable 3d and its last slice in range:
+            if enable_3d and slice_label==slices[-1]:
+                m1,m2=feret_3d(infer_seg_array_3d_1_filtered, infer_seg_array_3d_2_filtered)
+                #concat two df to the end of each other: m1 and m2
+                m1 = m1[m1.index !=1]
+                m2= m2[m2.index !=1]
+                #save to csv
+                general_m1 = pd.concat([m1,m2],axis=0)
+                general_m1.to_csv(new_path_to+patient_id +"_3dmask_metrics.csv")
+                #TODO: extract metrics from 3d masks
+                #volume	volume_convexhull	surface_area	diameter_volume_equivalent	diameter_surfacearea_equivalent	width_3d_bb	length_3d_bb	height_3d_bb	feret_3d_max	feret_3d_min	x_max_3d	y_max_3d	z_max_3d
+                result = np.array([patient_id,float(age),gender,
+                            objL_pred_minf, objR_pred_minf, centile_tmt,
+                            CSA_PRED_TM1_line, CSA_PRED_TM2_line, centile_csa,
+                            slice_label, 
+                            hd,
+                            m1['volume1'],m1['volume_convexhull1'],m1['surface_area1'],m1['diameter_volume_equivalent1'],m1['diameter_surfacearea_equivalent1'],m1['width_3d_bb1'],m1['length_3d_bb1'],m1['height_3d_bb1'],m1['feret_3d_max1'],m1['feret_3d_min1'],m1['x_max_3d1'],m1['y_max_3d1'],m1['z_max_3d1'],
+                            m2['volume2'],m2['volume_convexhull2'],m2['surface_area2'],m2['diameter_volume_equivalent2'],m2['diameter_surfacearea_equivalent2'],m2['width_3d_bb2'],m2['length_3d_bb2'],m2['height_3d_bb2'],m2['feret_3d_max2'],m2['feret_3d_min2'],m2['x_max_3d2'],m2['y_max_3d2'],m2['z_max_3d2']])
+                df_results = pd.DataFrame([result], columns=['PatientID','Age','Gender',
+                                                            'TMT1','TMT2','Centile_iTMT',
+                                                            'CSA_TM1','CSA_TM2','Centile_iCSA',
+                                                            "Slice_label","Hausdorff_distance_btw_TMs",
+                                                            'volume1','volume_convexhull1','surface_area1','diameter_volume_equivalent1','diameter_surfacearea_equivalent1','width_3d_bb1','length_3d_bb1','height_3d_bb1','feret_3d_max1','feret_3d_min1','x_max_3d1','y_max_3d1','z_max_3d1',
+                                                            'volume2','volume_convexhull2','surface_area2','diameter_volume_equivalent2','diameter_surfacearea_equivalent2','width_3d_bb2','length_3d_bb2','height_3d_bb2','feret_3d_max2','feret_3d_min2','x_max_3d2','y_max_3d2','z_max_3d2'])
+            else:
+                result = np.array([patient_id,float(age),gender,
+                            objL_pred_minf, objR_pred_minf, centile_tmt,
+                            CSA_PRED_TM1_line, CSA_PRED_TM2_line, centile_csa,
+                            slice_label, 
+                            hd])
+                
+                df_results = pd.DataFrame([result], columns=['PatientID','Age','Gender',
+                                                            'TMT1','TMT2','Centile_iTMT',
+                                                            'CSA_TM1','CSA_TM2','Centile_iCSA',
+                                                            "Slice_label","Hausdorff_distance_btw_TMs"])
+            df_results.to_csv(path_to+"/"+patient_id+"_results.csv",index=False)
+            print("Results saved to:",path_to+"/"+patient_id+"_results.csv")
+            
     # concatenate all results .csv files into one
     all_files = glob.glob(path_to+"/*_results.csv")
     li = []
