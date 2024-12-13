@@ -561,7 +561,7 @@ def predict_itmt(age = 9, gender="M",
     
             else:
                 centile_tmt = find_exact_centile(input_tmt, round(float(age),2), df_centile_boys)
-                centile_tmt = find_exact_centile(input_csa, round(float(age),2), df_centile_boys_csa)
+                centile_csa = find_exact_centile(input_csa, round(float(age),2), df_centile_boys_csa)
             print("iTMT Centile:",centile_tmt)  
             # save results
             #if enable 3d and its last slice in range:
