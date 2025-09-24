@@ -1,0 +1,39 @@
+Variable,Type,Description,Coding / Units
+ID,Identifier,Unique subject identifier,String or integer
+sex,Categorical,Biological sex,"F = Female, M = Male"
+age_at_MRI,Continuous,Age at MRI acquisition,"Years, decimal"
+TMT,Continuous,"Temporal Muscle Thickness at scan, absolute measure",Millimeters
+TMT.%,Continuous percentile,Percentile of TMT relative to age and sex reference population,0-100
+Weight,Continuous,Weight at scan,Kilograms
+Weight.%,Continuous percentile,Percentile of weight relative to age and sex reference population,0-100
+bmi,Continuous,Body Mass Index at scan,kg/m^2
+bmi.%,Continuous percentile,Percentile of BMI relative to age and sex reference population,0-100
+dx_age,Continuous,Age at initial diagnosis,"Years, decimal"
+diagnosis,Categorical,Primary diagnostic category,"e.g., Medulloblastoma, HGG, LGG, Other"
+align_on_dx_date,Continuous,"Time from diagnosis reference to scan date, negative values mean pre diagnosis scan","Years, decimal"
+treatment_type,Categorical,Index treatment category including combinations,"e.g., surgery, chemo, rt, rt+surgery, rt+chemo, rt+chemo+surgery, chemo+surgery"
+got_rt,Categorical binary,Indicator of radiotherapy received,"0 = No, 1 = Yes"
+got_chemo,Categorical binary,Indicator of chemotherapy received,"0 = No, 1 = Yes"
+treatment_age,Continuous,Age at start of index treatment,"Years, decimal"
+OS,Continuous,Overall survival time from diagnosis or baseline,Days or years depending on source (verify)
+expired?,Categorical,Vital status at last follow up,"Alive, Expired"
+align_on_treatment,Continuous,Time from treatment start reference to the scan date,"Years, decimal"
+Physical,Continuous,"Quality of Life score, physical functioning domain",0-100
+Physical_state,Categorical,QoL classification based on Physical score,"No data, Impaired, Normal"
+Physical_state_next,Categorical,Next interval QoL classification for Physical domain,Same scale as Physical_state
+Emotional,Continuous,"Quality of Life score, emotional functioning domain",0-100
+Emotional_state,Categorical,QoL classification based on Emotional score,"No data, Impaired, Normal"
+Emotional_state_next,Categorical,Next interval QoL classification for Emotional domain,Same scale as Emotional_state
+Social,Continuous,"Quality of Life score, social functioning domain",0-100
+Social_state,Categorical,QoL classification based on Social score,"No data, Impaired, Normal"
+Social_state_next,Categorical,Next interval QoL classification for Social domain,Same scale as Social_state
+School,Continuous,"Quality of Life score, school functioning domain",0-100
+School_state,Categorical,QoL classification based on School score,"No data, Impaired, Normal"
+School_state_next,Categorical,Next interval QoL classification for School domain,Same scale as School_state
+Composite,Continuous,Composite Quality of Life score (aggregate across domains),0-100
+Composite_state,Categorical,QoL classification based on Composite score,"No data, Impaired, Normal"
+Composite_state_next,Categorical,Next interval QoL classification for Composite domain,Same scale as Composite_state
+rt_loc,Categorical,"Radiotherapy target locations, multiple terms may be concatenated with plus signs","Free text list, e.g., craniospinal+other+"
+accepted (image QC),Categorical binary,Indicator whether imaging passed quality control,"0 = Not accepted, 1 = Accepted"
+Race,Categorical,Self reported race,"e.g., White, Black, Asian, Other"
+Ethnicity,Categorical,Self reported ethnicity,"e.g., Hispanic, Non Hispanic, Unknown"

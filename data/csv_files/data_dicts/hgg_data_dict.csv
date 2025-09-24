@@ -1,0 +1,14 @@
+Variable,Type,Description,Coding / Units
+id,Identifier,Unique subject identifier,String or integer. Anonymous key
+sex,Categorical (binary),Biological sex of subject,"0 = Female, 1 = Male"
+days_at_scan,Continuous,Number of days from diagnosis (or baseline reference) to the scan date,Days (integer)
+race.ethnicity,Categorical,Self-reported race or ethnicity,"Values depend on cohort (e.g. White, Black, Asian, Hispanic, Other)"
+resection,Categorical (ordinal),Surgical resection status at diagnosis,"Unknown, No surgery, Gross total resection, Subtotal resection, Near total resection"
+weight,Continuous,Subject weight at scan,Kilograms (kg)
+status,Categorical,Vital status at last follow-up,"Alive, Expired"
+BMI,Continuous,Body Mass Index at scan,kg/m
+TMT,Continuous,Temporal Muscle Thickness at scan,Millimeters (mm)
+TMT.%,Continuous (percentile),Percentile of TMT compared to age- and sex-matched reference population,0-100
+BMI.%,Continuous (percentile),Percentile of BMI compared to age- and sex-matched reference population,0-100
+Weight.%,Continuous (percentile),Percentile of weight compared to age- and sex-matched reference population,0-100
+OS,Continuous (time-to-event),Overall survival time from diagnosis or baseline,Days (numeric)

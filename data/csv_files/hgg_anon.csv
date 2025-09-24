@@ -1,0 +1,116 @@
+id,sex(0-female),age (anonymized),race.ethnicity,resection,weight,status,BMI,TMT,TMT.%,BMI.%,Weight.%,OS
+1,1,,Non-Hispanic Caucasian/white,Unknown,79.4,expired,23.7,11.82,15,58.07944351,75.48587156,634
+2,0,,Non-Hispanic Caucasian/white,Unknown,50.2,alive,21,12.43,42,40.92290008,15.94040411,5068
+3,1,,Unknown,Unknown,92.5,alive,28.54938272,13.85,44,90.57003162,93.08663038,231
+4,1,,Non-Hispanic Caucasian/white,No surgery,66,alive,22.1,10.9,31,88.48349517,96.91117929,1728
+5,1,,Unknown,Gross total resection,76,expired,,11.3,42,,99.49187298,431
+6,0,,Non-Hispanic Caucasian/white,Subtotal resection,61.235,expired,23.9,9.94,6,71.18180946,61.47770966,432
+7,0,,Non-Hispanic Caucasian/white,Subtotal resection,61.235,alive,23.4,9.64,5,67.20684455,61.47770966,3774
+8,0,,Non-Hispanic Caucasian/white,Near total resection,100,expired,,12.07,33,,98.66704236,772
+9,0,,Non-Hispanic Caucasian/white,Subtotal resection,54.43109132,expired,23.25220698,11.19,25,72.83026554,44.94182636,899
+10,0,,Unknown,Unknown,64.41012473,lost to followup,23.09517183,17.1,98,64.52913412,71.30575711,477
+11,0,,Asian American/Asian,No surgery,50.4,expired,18.1,12.02,34,6.875217846,16.67367495,752
+12,1,,Non-Hispanic Caucasian/white,Near total resection,84,expired,25.08286303,10.56,5,72.02231081,84.01509804,1329
+13,0,,Asian American/Asian,Unknown,47.62720491,alive,15.91339668,9.33,4,0.140089356,7.954416888,2793
+14,0,,Unknown,Unknown,0,expired,,13.43,75,,0,124
+15,1,,Non-Hispanic Caucasian/white,Unknown,74.843,expired,23.88936768,10.41,5,60.24209243,63.76301959,455
+16,1,,Non-Hispanic African American/Black,Subtotal resection,0,expired,,21,99,,0,167
+17,0,,Non-Hispanic Caucasian/white,Unknown,70,expired,24.22145329,9.79,6,74.53989272,84.14250483,414
+18,1,,Non-Hispanic African American/Black,Unknown,0,alive,,8.67,45,,0,2784
+19,1,,Non-Hispanic Caucasian/white,Unknown,78.1,expired,28.7,10.03,4,91.0027332,72.48683195,524
+20,1,,Unknown,Unknown,89.3,expired,25.26595745,16.58,83,73.54488231,90.47826789,461
+21,1,,Non-Hispanic Caucasian/white,Biopsy,0,expired,,6.5,1,,0,136
+22,1,,Non-Hispanic Caucasian/white,Unknown,102.0582962,expired,28.5709516,15.28,68,90.63332369,97.36194051,610
+23,1,,Non-Hispanic Caucasian/white,Unknown,77.11071271,alive,21.2,12.87,29,25.19186201,70.02005193,2618
+24,0,,Middle Eastern,Biopsy,26,expired,,5.11,1,,1.160400576,184
+25,1,,Non-Hispanic Caucasian/white,Near total resection,28.12273026,alive,,8.24,5,,11.47028261,2325
+26,0,,Non-Hispanic Caucasian/white,Biopsy,74,alive,26.85440557,11.77,30,86.23147062,88.62882165,2206
+27,1,,Unknown,Unknown,103.6,expired,29,13.52,41,91.80296384,97.73927243,317
+28,1,,Non-Hispanic Caucasian/white,Unknown,62.5,expired,20.3,11.71,14,14.4694608,21.23756469,489
+29,1,,Non-Hispanic Caucasian/white,No surgery,100,expired,,10.27,5,,97.29465825,252
+30,0,,Non-Hispanic Caucasian/white,Biopsy,34.6,alive,,9.97,33,,68.75915256,2160
+31,0,,Non-Hispanic Caucasian/white,Gross total resection,49.90000153,alive,,11.83,39,,29.81729076,2096
+32,0,,Non-Hispanic Caucasian/white,Subtotal resection,49,expired,,11.52,56,,91.48402284,1537
+33,0,,Non-Hispanic Caucasian/white,Unknown,73,expired,23.0400202,11.97,30,64.02346477,87.4854289,251
+34,0,,Asian American/Asian,Subtotal resection,54.43,alive,19.99265381,14.55,86,27.50758214,33.53790497,1899
+35,0,,Unknown,Unknown,21,alive,,7.34,7,,65.63446768,1844
+36,1,,Non-Hispanic Caucasian/white,Unknown,74.84275057,alive,21.8,14.17,51,33.25253351,63.76228603,1768
+37,0,,Non-Hispanic Caucasian/white,Gross total resection,30,alive,,11.63,52,,9.613230389,1766
+38,0,,Non-Hispanic Caucasian/white,Unknown,72,expired,24.62296091,8.61,2,76.07957991,86.21987596,163
+39,0,,Non-Hispanic Caucasian/white,Unknown,42.6,expired,14.21,13.19,59,0.000105527,0.828051272,369
+40,1,,Non-Hispanic Caucasian/white,Unknown,65.77090202,alive,19.1,10.53,5,4.803114467,32.52328567,1470
+41,1,,Non-Hispanic Caucasian/white,Gross total resection,100.2,expired,30.8,17.72,96,95.24306996,96.82020935,698
+42,0,,Other,Unknown,76.20352785,alive,32.8,13.86,72,95.77123495,90.77163279,442
+43,1,,Non-Hispanic Caucasian/white,Biopsy,81.2,alive,24.5,10.88,8,66.67413544,79.19594376,1393
+44,1,,Unknown,Unknown,122.4699555,alive,34.71,10.03,3,98.36329733,99.63036872,615
+45,1,,Non-Hispanic Caucasian/white,Subtotal resection,68.04,alive,29.34,11.54,13,92.61877037,40.81029865,1139
+46,0,,Non-Hispanic Caucasian/white,Unknown,100.24,expired,,10.95,19,,98.6529492,396
+47,0,,Unknown,Unknown,24,expired,,7.75,10,,72.16830867,390
+48,1,,Unknown,Unknown,21,expired,,7.6,5,,3.239490136,180
+49,1,,Unknown,Unknown,99.79,expired,29.15704894,15.27,69,92.19123245,96.68616017,618
+50,0,,Middle Eastern,Unknown,16,lost to followup,,8.46,40,,70.98511595,233
+51,0,,Other,Biopsy,64,expired,,19.04,98,,87.14828216,695
+52,0,,Unknown,Unknown,123.832,alive,39.17,15.44,94,98.14912494,99.65308164,958
+53,0,,Hispanic/Latinx,Unknown,41,expired,,10.25,48,,96.38032139,343
+54,1,,Non-Hispanic Caucasian/white,Gross total resection,70.7604,expired,,16.29,90,,78.13842603,203
+55,0,,Non-Hispanic Caucasian/white,Biopsy,64.8637,expired,,13.55,70,,76.31584624,681
+56,1,,Non-Hispanic Caucasian/white,No surgery,86.26,expired,16.7,11.5,21,1.142640584,93.71657101,353
+57,1,,Non-Hispanic Caucasian/white,No surgery,72.57478843,expired,29.82,10.95,27,98.30550684,96.80114003,281
+58,1,,Non-Hispanic Caucasian/white,No surgery,21.772,expired,15.64,7.27,6,55.27673987,42.62886044,550
+59,1,,Non-Hispanic Caucasian/white,Unknown,17.69,expired,14.62,7.24,8,24.26635079,23.09174859,190
+60,1,,Non-Hispanic Caucasian/white,No surgery,90.703,expired,19,8.64,1,22.30894256,96.87155973,557
+61,0,,Non-Hispanic Caucasian/white,Subtotal resection,0,expired,19.7,9.82,6,23.68574615,0,382
+62,1,,Unknown,Unknown,40,expired,23.31,7.23,2,97.09273175,90.42068985,475
+63,0,,Unknown,Unknown,23.8,expired,15.99,6.01,1,66.82178668,76.29879751,625
+64,0,,Unknown,Unknown,22,expired,15.54,7.6,12,61.21805034,86.84806957,231
+65,0,,Non-Hispanic Caucasian/white,Unknown,56,expired,24.89,9.38,12,95.88516347,95.31147781,683
+66,1,,Non-Hispanic Caucasian/white,Unknown,90.71848554,expired,28.3,15.52,74,89.80461109,91.73423877,325
+67,1,,Non-Hispanic African American/Black,Biopsy,13.7,expired,13.98,4.56,1,6.211572079,0.999660792,386
+68,0,,Non-Hispanic Caucasian/white,No surgery,20,expired,15.94,6.4,2,70.13765737,63.84851198,504
+69,0,,Asian American/Asian,Biopsy,37,expired,21.89,9.55,42,97.83861954,98.33568693,568
+70,0,,Non-Hispanic Caucasian/white,Biopsy,90.71848554,alive,37.1,16.63,97,97.67397801,97.37318466,2280
+71,1,,Unknown,Unknown,32,alive,19.23,5.77,1,92.18809638,87.65121274,2808
+72,1,,Non-Hispanic Caucasian/white,Unknown,83.91,alive,24.7,15.49,70,68.59632361,83.87698609,2746
+73,0,,Non-Hispanic Caucasian/white,Biopsy,30,expired,17.75,5.05,1,76.53445087,68.69005899,52
+74,1,,Unknown,Unknown,19,expired,16.2,5.81,2,72.63836679,64.21072549,619
+75,0,,Non-Hispanic Caucasian/white,Biopsy,27.669,expired,15.9,8.07,7,41.95707543,38.68993208,174
+76,1,,Non-Hispanic Caucasian/white,Biopsy,21,expired,16.74,7,5,80.74250588,47.73245221,249
+77,0,,Non-Hispanic Caucasian/white,Biopsy,34.01943208,expired,16.64,10.82,42,39.38995943,39.0958243,602
+78,1,,Unknown,Unknown,72,expired,27.1,9.71,3,86.50019525,56.47754734,496
+79,0,,Hispanic/Latinx,Biopsy,17,expired,14.85,2.23,1,36.73449271,60.36699245,373
+80,0,,Hispanic/Latinx,No surgery,17,expired,18.45,6.12,3,96.21035689,90.72284235,534
+81,0,,Non-Hispanic Caucasian/white,Biopsy,15,expired,15,5.38,1,44.25684543,13.05456548,302
+82,0,,Non-Hispanic Caucasian/white,Unknown,19.5,expired,18.38,7.94,24,96.29707571,90.49188157,403
+83,0,,Hispanic/Latinx,Biopsy,45,expired,14.6,15.06,98,23.65335782,99.4132782,173
+84,0,,Non-Hispanic Caucasian/white,Biopsy,40,alive,22.96,9.18,26,97.42823346,96.36580534,2003
+85,1,,Hispanic/Latinx,Unknown,13,expired,14,11.73,97,4.145934516,2.804800348,243
+86,0,,Middle Eastern,Biopsy,22,expired,15.7,7.11,5,62.43561285,69.11668893,4
+87,1,,Non-Hispanic Caucasian/white,Subtotal resection,85.44,expired,26.37,12.07,33,92.42352776,95.17152709,710
+88,0,,Middle Eastern,Biopsy,21,lost to followup,15.7,6.86,4,63.23783222,63.24741891,337
+89,1,,Non-Hispanic Caucasian/white,Unknown,27.9,expired,17.86,5.69,1,83.24147878,64.78399972,418
+90,0,,Non-Hispanic Caucasian/white,No surgery,29.1,expired,17.22,5.69,1,54.29749985,21.13449182,261
+91,0,,Non-Hispanic Caucasian/white,Subtotal resection,58.9670156,expired,25.19,10.56,15,84.07338195,63.48801095,977
+92,1,,Non-Hispanic Caucasian/white,No surgery,17.69,expired,14.62,6.26,4,18.07240308,65.26949107,132
+93,0,,Non-Hispanic Caucasian/white,Biopsy,57.60623832,expired,20.2,9.38,3,30.26689808,47.44843315,441
+94,0,,Hispanic/Latinx,No surgery,32,expired,14,17.94,99,8.941731115,99.9918444,624
+95,0,,Non-Hispanic Caucasian/white,Biopsy,77.11071271,alive,20.3,9.74,5,31.60561997,91.52255916,839
+96,1,,Middle Eastern,No surgery,46.05,expired,19.42,10.4,15,49.56900805,20.12859736,511
+97,1,,Non-Hispanic Caucasian/white,Biopsy,74.4,expired,16.7,13.97,63,1.23956703,79.62824583,302
+98,1,,Unknown,Unknown,18,expired,15.72,11.07,94,57.92487706,57.69411548,727
+99,1,,Non-Hispanic Caucasian/white,Biopsy,81.65,alive,24.41,10.03,4,65.75,80.04,1393
+100,0,,Non-Hispanic Caucasian/white,Subtotal resection,54.43,expired,23.32,12.7,55,73.65,45.35,899
+101,1,,Hispanic/Latinx,Subtotal resection,65,expired,22.65,13.79,63,74.37,63.7,392
+102,1,,Hispanic/Latinx,Gross total resection,22.68,expired,15.04,11.14,88,39,76.75,494
+103,0,,Asian American/Asian,Unknown,54.88,expired,20.23,12.56,48,31.2,36.83,752
+104,0,,Non-Hispanic Caucasian/white,Gross total resection,56.7,alive,21.59,9.8,7,56.03,54.31,112
+105,0,,Unknown,Gross total resection,23,alive,16.37,8.05,18,77.5,85.49,2199
+106,1,,Non-Hispanic Caucasian/white,Subtotal resection,72,expired,20.82,11.4,33,74.92,96.33,661
+107,0,,Hispanic/Latinx,Unknown,18.14,expired,16.85,6.42,4,83.82,92.12,442
+108,1,,Non-Hispanic Caucasian/white,Gross total resection,70.5,expired,23.22,13.41,53,73.54,69.79,2156
+109,0,,Non-Hispanic Caucasian/white,Subtotal resection,49.8,expired,18.68,8.66,2,22.08,27.11,312
+110,1,,Non-Hispanic Caucasian/white,Biopsy,60,expired,19.56,10.23,13,52.56,73.64,552
+111,1,,Non-Hispanic Caucasian/white,Subtotal resection,30,alive,17.01,10.44,64,81,94,1652
+112,1,,Non-Hispanic Caucasian/white,Gross total resection,20.4,alive,16.14,8.5,36,71.21,78.76,1625
+113,0,,Non-Hispanic Caucasian/white,Subtotal resection,44.5,alive,16.05,8.39,2,10.58,40.41,1614
+114,0,,Middle Eastern,Biopsy,30,alive,23.27,7.09,7,99.7,99.71,89
+115,1,,Other,Subtotal resection,77.11,expired,23.35,11.18,14,67.69,78.32,66

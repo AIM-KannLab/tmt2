@@ -1,11 +1,10 @@
 # Artificial Intelligence Analysis of Temporalis Muscle Thickness for Monitoring Sarcopenia and Clinical Outcomes in Patients with Pediatric Brain Tumors
 
+Containerized version of the deep learning model for temporalis muscle thickness (TMT) segmentation and quantification. Updated version of the model from:
+Zapaishchykova, A., Liu, K.X., Saraf, A. et al. Automated temporalis muscle quantification and growth charts for children through adulthood. Nat Commun 14, 6863 (2023). https://doi-org.ezp-prod1.hul.harvard.edu/10.1038/s41467-023-42501-1 
+
 ## Prerequisites
 - Docker OR Singularity (use tmt.def file)
-
-## Note
-- This is a CPU-only release. The docker will run on the CPU, and the inference time will depend on the number of subjects and the size of the MRI files.
-- This won't work on MAC OS. Linux or Windows is recommended.
 
 ## Description
 The docker will run an inference with the pre-trained deep learning model to generate a temporalis muscle (TM) segmentation and output a predicted sarcopenia score based on a subject's TMT, age, and sex.
@@ -48,8 +47,14 @@ input/sub-pixar067_anat_sub-pixar067_T1w.nii.gz,7,M
 ```
 
 ## References
-Automated temporalis muscle quantification and growth charts for children through adulthood
-[doi.org/10.1038/s41467-023-42501-1](https://doi.org/10.1038/s41467-023-42501-1)
+- TBD - under review
+- Zapaishchykova, A., Liu, K.X., Saraf, A. et al. Automated temporalis muscle quantification and growth charts for children through adulthood. Nat Commun 14, 6863 (2023). https://doi-org.ezp-prod1.hul.harvard.edu/10.1038/s41467-023-42501-1 
+
+Anonymized data used in the publication is included in the `data/csv` folder together with the data dictionaries for each file.
+
+## Notes
+- This is a CPU-only release. The docker will run on the CPU, and the inference time will depend on the number of subjects and the size of the MRI files.
+- This won't work on MAC OS. Linux or Windows is recommended.
 
 ## Known Issues
 If you encounter an error with docker `AppArmor enabled on system but the docker-default profile could not be loaded`, try running the following command:

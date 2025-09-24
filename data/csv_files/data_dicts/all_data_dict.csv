@@ -1,0 +1,28 @@
+Variable,Type,Description,Coding / Units
+ID,Identifier,"Unique subject identifier, anonymized",String or integer
+dataset,Categorical,Data source label for the record,"e.g., radart, empower"
+race,Categorical,Self reported race,"e.g., White, Black, Asian, Other"
+ethnicity,Categorical,Self reported ethnicity or Hispanic origin,"e.g., Hispanic, Non Hispanic, Unknown"
+sex,Categorical,Biological sex,"F = Female, M = Male"
+age_at_MRI,Continuous,Age at MRI acquisition,"Years, decimal"
+TMT,Continuous,"Temporal Muscle Thickness at scan, absolute measure",Millimeters
+TMT.%,Continuous percentile,Percentile of TMT relative to age and sex reference population,0 to 100
+Weight,Continuous,Weight at scan,Kilograms
+Weight.%,Continuous percentile,Percentile of weight relative to age and sex reference population,0 to 100
+bmi,Continuous,Body Mass Index at scan,kg/m^2
+bmi.%,Continuous percentile,Percentile of BMI relative to age and sex reference population,0 to 100
+height,Continuous,Stature at scan,Centimeters
+height.%,Continuous percentile,Percentile of height relative to age and sex reference population,0 to 100
+dx_age,Continuous,Age at initial diagnosis,"Years, decimal"
+diagnosis,Categorical,Primary diagnostic category," e.g., Medulloblastoma, HGG, LGG, Other"
+align_on_dx_date,Continuous,"Time from diagnosis reference to the scan date, negative values mean pre diagnosis scan","Years, decimal"
+treatment_type,Categorical,Index treatment category including combinations,"e.g., surgery, chemo, rt, rt+surgery, rt+chemo, rt+chemo+surgery, chemo+surgery"
+got_rt,Categorical binary,Indicator of radiotherapy received,"0 = No, 1 = Yes"
+got_chemo,Categorical binary,Indicator of chemotherapy received,"0 = No, 1 = Yes"
+treatment_age,Continuous,Age at start of index treatment,"Years, decimal"
+OS,Continuous,Overall survival time from diagnosis or baseline,"Days, verify units if your source uses years"
+expired?,Categorical,Vital status at last follow up,"Alive, Expired"
+is_emp_subj,Categorical binary,Indicator that the subject is part of the Empower subset,"0 = No, 1 = Yes"
+dx_type_empower,Categorical or code,Study specific diagnostic subtype code for Empower only,"Integer or string code, verify mapping"
+align_on_treatment,Continuous,Time from treatment start reference to the scan date,"Years, decimal"
+rt_loc,Categorical,"Radiotherapy target locations, multiple terms may be concatenated with plus signs","Free text list, e.g., craniospinal+other+"
