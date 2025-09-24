@@ -1,5 +1,4 @@
-# Predict Temporalis Muscle Thickness Score
-Upd. 11.11.24: added pseudo-3d segmentation (segmentation is still 2d, it just goes +-n_slices up and down to create a "belt" and 3d metrics will be calculated)
+# Artificial Intelligence Analysis of Temporalis Muscle Thickness for Monitoring Sarcopenia and Clinical Outcomes in Patients with Pediatric Brain Tumors
 
 ## Prerequisites
 - Docker OR Singularity (use tmt.def file)
